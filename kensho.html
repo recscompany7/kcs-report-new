@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>検証実験 日別実績報告</title>
+<style>
+  :root {
+    --primary: #7c3aed;
+    --primary-hover: #6d28d9;
+    --primary-light: #ede9fe;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --accent: #f59e0b;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --radius: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    background: var(--gray-50); color: var(--gray-800); line-height:1.6;
+  }
+  .header {
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    color: white; padding:20px 24px;
+    box-shadow: var(--shadow-md); position:sticky; top:0; z-index:100;
+  }
+  .header h1 { font-size:22px; font-weight:700; }
+  .header p { font-size:13px; opacity:0.85; margin-top:2px; }
+
+  .nav { display:flex; gap:4px; background:var(--gray-100); padding:4px; margin:16px; border-radius:var(--radius); }
+  .nav button {
+    flex:1; padding:10px 16px; border:none; background:transparent; border-radius:6px;
+    font-size:14px; font-weight:600; color:var(--gray-500); cursor:pointer; transition:all 0.2s;
+  }
+  .nav button.active { background:white; color:var(--primary); box-shadow:var(--shadow); }
+
+  .container { max-width:1000px; margin:0 auto; padding:0 16px 32px; }
+
+  .card { background:white; border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; margin-bottom:16px; }
+  .card-title {
+    font-size:15px; font-weight:700; color:var(--gray-800); margin-bottom:12px;
+    display:flex; align-items:center; gap:8px;
+  }
+
+  .section {
+    border:1.5px solid var(--gray-200); border-radius:var(--radius); margin-bottom:12px; overflow:hidden;
+  }
+  .section-header {
+    background:var(--gray-50); padding:10px 14px; font-weight:700; font-size:14px;
+    color:var(--gray-700); cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+    user-select:none;
+  }
+  .section-header:hover { background:var(--gray-100); }
+  .section-header .arrow { transition:transform 0.2s; font-size:12px; }
+  .section-header.collapsed .arrow { transform:rotate(-90deg); }
+  .section-body { padding:12px 14px; }
+  .section-body.collapsed { display:none; }
+
+  .field-row {
+    display:grid; grid-template-columns:160px 1fr; gap:8px; align-items:center;
+    padding:4px 0; border-bottom:1px solid var(--gray-50);
+  }
+  .field-row:last-child { border-bottom:none; }
+  .field-row.sub { grid-template-columns:40px 120px 1fr; padding-left:12px; }
+
+  .field-label { font-size:13px; font-weight:600; color:var(--gray-600); white-space:nowrap; }
+  .field-label.sub-label { color:var(--gray-400); font-size:12px; }
+
+  .col-header { font-size:11px; font-weight:700; color:var(--gray-400); text-align:center; text-transform:uppercase; letter-spacing:0.5px; }
+
+  .num-input {
+    width:100%; padding:7px 10px; border:1.5px solid var(--gray-200); border-radius:6px;
+    font-size:14px; text-align:center; font-family:inherit; background:white; transition:border-color 0.2s;
+  }
+  .num-input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light); }
+  .num-input::placeholder { color:var(--gray-300); }
+
+  .form-top { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+  @media(max-width:600px) { .form-top { grid-template-columns:1fr; } }
+  .form-group { display:flex; flex-direction:column; gap:4px; }
+  .form-group label { font-size:13px; font-weight:600; color:var(--gray-600); }
+  .form-group label .req { color:var(--danger); }
+  .form-group input, .form-group textarea {
+    padding:10px 12px; border:1.5px solid var(--gray-200); border-radius:6px;
+    font-size:15px; font-family:inherit; background:white;
+  }
+  .form-group input:focus, .form-group textarea:focus {
+    outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light);
+  }
+  .form-group textarea { resize:vertical; min-height:60px; }
+
+  .btn {
+    display:inline-flex; align-items:center; gap:6px; padding:10px 20px; border:none;
+    border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:inherit;
+  }
+  .btn-primary { background:var(--primary); color:white; }
+  .btn-primary:hover { background:var(--primary-hover); }
+  .btn-success { background:var(--success); color:white; }
+  .btn-outline { background:white; color:var(--gray-600); border:1.5px solid var(--gray-200); }
+  .btn-danger { background:var(--danger); color:white; font-size:12px; padding:6px 12px; }
+  .btn-row { display:flex; gap:8px; margin-top:16px; justify-content:flex-end; flex-wrap:wrap; }
+
+  .toast {
+    position:fixed; top:80px; right:20px; background:var(--success); color:white;
+    padding:12px 20px; border-radius:var(--radius); font-weight:600; font-size:14px;
+    box-shadow:var(--shadow-md); transform:translateX(120%); transition:transform 0.3s; z-index:200;
+  }
+  .toast.show { transform:translateX(0); }
+
+  .tab { display:none; }
+  .tab.active { display:block; }
+
+  .summary-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:10px; margin-bottom:16px; }
+  .summary-card { background:white; border-radius:var(--radius); box-shadow:var(--shadow); padding:14px 16px; text-align:center; }
+  .summary-card .label { font-size:11px; color:var(--gray-500); font-weight:600; }
+  .summary-card .value { font-size:26px; font-weight:800; color:var(--gray-800); margin-top:2px; }
+  .summary-card .sub { font-size:11px; color:var(--gray-400); margin-top:2px; }
+  .summary-card.highlight { border:2px solid var(--accent); }
+  .summary-card.highlight .value { color:var(--accent); }
+
+  .rate-display {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border:2px solid var(--accent); border-radius:var(--radius);
+    padding:14px 20px; text-align:center; margin-bottom:16px;
+  }
+  .rate-display .rate-label { font-size:13px; font-weight:700; color:#92400e; }
+  .rate-display .rate-value { font-size:32px; font-weight:900; color:#d97706; margin-top:2px; }
+
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th {
+    background:var(--gray-50); text-align:left; padding:8px 10px; font-weight:700;
+    font-size:11px; color:var(--gray-500); border-bottom:2px solid var(--gray-200);
+    white-space:nowrap;
+  }
+  td { padding:8px 10px; border-bottom:1px solid var(--gray-100); white-space:nowrap; }
+  tr:hover td { background:var(--gray-50); }
+  .text-c { text-align:center; }
+  .fw-b { font-weight:600; }
+
+  .empty-state { text-align:center; padding:40px 20px; color:var(--gray-400); }
+  .empty-state .icon { font-size:40px; margin-bottom:8px; }
+  .hidden { display:none; }
+
+  .filter-row { display:flex; gap:10px; flex-wrap:wrap; align-items:end; }
+  .filter-row .form-group { min-width:130px; }
+
+  .preview-card {
+    background:var(--gray-50); border:1.5px solid var(--gray-200); border-radius:var(--radius);
+    padding:16px; margin-top:12px; font-size:13px; line-height:1.8; white-space:pre-wrap;
+    font-family:'SF Mono','Menlo','Consolas',monospace;
+  }
+  .copy-btn {
+    background:var(--gray-100); border:1px solid var(--gray-300); border-radius:6px;
+    padding:6px 14px; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s;
+  }
+  .copy-btn:hover { background:var(--gray-200); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🧪 検証実験 日別実績報告</h1>
+  <p>携帯料金比較ツール検証 — 着座・興味づけ・成約実績を入力・管理</p>
+</div>
+
+<div class="nav">
+  <button class="active" onclick="switchTab('input')">📝 実績入力</button>
+  <button onclick="switchTab('monthly')">📅 月間累積</button>
+  <button onclick="switchTab('list')">📋 一覧</button>
+  <button onclick="switchTab('summary')">📈 集計</button>
+</div>
+
+<div class="container">
+
+<!-- ====== 入力タブ ====== -->
+<div id="tab-input" class="tab active">
+<div class="card">
+  <div class="card-title">📝 検証実験 日別実績入力</div>
+  <form id="reportForm" onsubmit="return submitReport(event)">
+
+    <div class="form-top">
+      <div class="form-group">
+        <label>報告者名 <span class="req">*</span></label>
+        <input type="text" id="reporterName" required placeholder="例：田中太郎" list="nameList">
+        <datalist id="nameList"></datalist>
+      </div>
+      <div class="form-group">
+        <label>報告日 <span class="req">*</span></label>
+        <input type="date" id="reportDate" required>
+      </div>
+    </div>
+
+    <!-- 着座・契約決定 -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        🎯 着座・契約決定 <span class="arrow">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <div class="field-label"></div>
+          <div class="col-header">件数</div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">着座数</div>
+          <input class="num-input" type="number" min="0" id="f_chakuza" placeholder="0" oninput="calcRate()">
+        </div>
+        <div class="field-row">
+          <div class="field-label">興味づけ数</div>
+          <input class="num-input" type="number" min="0" id="f_kyomi" placeholder="0" oninput="calcRate()">
+        </div>
+        <div class="field-row">
+          <div class="field-label">成約数</div>
+          <input class="num-input" type="number" min="0" id="f_kettei" placeholder="0" oninput="calcRate()">
+        </div>
+        <div style="margin-top:8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">
+          <div class="rate-display">
+            <div class="rate-label">興味づけ率<br><span style="font-size:11px;opacity:0.75;">興味づけ ÷ 着座</span></div>
+            <div class="rate-value" id="kyomiRateDisplay">0.0%</div>
+          </div>
+          <div class="rate-display">
+            <div class="rate-label">成約率<br><span style="font-size:11px;opacity:0.75;">成約 ÷ 着座</span></div>
+            <div class="rate-value" id="rateDisplay">0.0%</div>
+          </div>
+          <div class="rate-display">
+            <div class="rate-label">クロージング率<br><span style="font-size:11px;opacity:0.75;">成約 ÷ 興味づけ</span></div>
+            <div class="rate-value" id="closeRateDisplay">0.0%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MNP -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        🔄 MNP <span class="arrow">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <div class="field-label">MNP</div>
+          <input class="num-input" type="number" min="0" id="f_mnp" placeholder="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- 回線 -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        📱 回線（新規・機変） <span class="arrow">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <div class="field-label">新規</div>
+          <input class="num-input" type="number" min="0" id="f_shinki" placeholder="0">
+        </div>
+        <div class="field-row">
+          <div class="field-label">機変</div>
+          <input class="num-input" type="number" min="0" id="f_kihen" placeholder="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- 光・回線サービス -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        🌐 光・回線サービス <span class="arrow">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <div class="field-label">光1GB</div>
+          <input class="num-input" type="number" min="0" id="f_hikari1" placeholder="0">
+        </div>
+        <div class="field-row">
+          <div class="field-label">光10GB</div>
+          <input class="num-input" type="number" min="0" id="f_hikari10" placeholder="0">
+        </div>
+        <div class="field-row">
+          <div class="field-label">H5G</div>
+          <input class="num-input" type="number" min="0" id="f_h5g" placeholder="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- カード -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        💳 カード <span class="arrow">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <div class="field-label">Gカード</div>
+          <input class="num-input" type="number" min="0" id="f_gcard" placeholder="0">
+        </div>
+        <div class="field-row">
+          <div class="field-label">Rカード</div>
+          <input class="num-input" type="number" min="0" id="f_rcard" placeholder="0">
+        </div>
+        <div class="field-row">
+          <div class="field-label">Pカード</div>
+          <input class="num-input" type="number" min="0" id="f_pcard" placeholder="0">
+        </div>
+        <div class="field-row">
+          <div class="field-label">Uカード</div>
+          <input class="num-input" type="number" min="0" id="f_ucard" placeholder="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- SLS・セキュリティ -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        🛡 SLS系・セキュリティ <span class="arrow">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <div class="field-label">SLS系</div>
+          <input class="num-input" type="number" min="0" id="f_sls" placeholder="0">
+        </div>
+        <div class="field-row">
+          <div class="field-label">詐欺バスター</div>
+          <input class="num-input" type="number" min="0" id="f_sagibuster" placeholder="0">
+        </div>
+        <div class="field-row">
+          <div class="field-label">ウイルスバスター</div>
+          <input class="num-input" type="number" min="0" id="f_virusbuster" placeholder="0">
+        </div>
+        <div class="field-row">
+          <div class="field-label">あんセキS</div>
+          <input class="num-input" type="number" min="0" id="f_anseki" placeholder="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- その他サービス -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        ⚡ その他サービス <span class="arrow">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <div class="field-label">でんき</div>
+          <input class="num-input" type="number" min="0" id="f_denki" placeholder="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- 備考 -->
+    <div class="form-group" style="margin-top:8px;">
+      <label>備考・メモ</label>
+      <textarea id="memo" placeholder="特記事項があれば入力"></textarea>
+    </div>
+
+    <!-- 改善点 -->
+    <div class="form-group" style="margin-top:12px;">
+      <label>💡 改善点</label>
+      <textarea id="kaizen" placeholder="ツールの使い勝手・トークの改善点・気づいた点などを入力" rows="4"></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="btn btn-outline" onclick="resetForm()">リセット</button>
+      <button type="button" class="btn btn-outline" onclick="previewText()" style="border-color:var(--primary);color:var(--primary);">👁 テキストプレビュー</button>
+      <button type="submit" class="btn btn-primary" id="submitBtn">✅ 報告を登録</button>
+    </div>
+  </form>
+
+  <!-- テキストプレビュー -->
+  <div id="previewArea" class="hidden" style="margin-top:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-weight:700;font-size:14px;">📋 テキスト出力</span>
+      <button class="copy-btn" onclick="copyPreview()">📋 コピー</button>
+    </div>
+    <div class="preview-card" id="previewText"></div>
+  </div>
+</div>
+
+<!-- 直近の報告 -->
+<div class="card">
+  <div class="card-title">🕐 直近の報告（5件）</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>日付</th><th>報告者</th><th>着座</th><th>興味</th><th>成約</th><th>興味率</th><th>成約率</th><th>MNP</th><th>新規</th><th>機変</th><th>光</th><th>カード</th>
+      </tr></thead>
+      <tbody id="recentBody"></tbody>
+    </table>
+  </div>
+  <div id="recentEmpty" class="empty-state hidden"><div class="icon">📭</div><p>まだ報告がありません</p></div>
+</div>
+</div>
+
+<!-- ====== 月間累積タブ ====== -->
+<div id="tab-monthly" class="tab">
+  <div class="card">
+    <div class="card-title">📅 月間累積実績</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+      <label style="font-weight:600;font-size:13px;">対象月:</label>
+      <select id="monthSelect" onchange="updateMonthly()" style="padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:6px;font-size:14px;"></select>
+      <label style="font-weight:600;font-size:13px;margin-left:12px;">報告者:</label>
+      <select id="monthName" onchange="updateMonthly()" style="padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:6px;font-size:14px;"><option value="">全員</option></select>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px;" id="monthSummary"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>日付</th><th>報告者</th><th>着座</th><th>興味</th><th>成約</th><th>興味率</th><th>成約率</th><th>ｸﾛｰｼﾞﾝｸﾞ率</th>
+          <th>MNP</th><th>新規</th><th>機変</th>
+          <th>光1G</th><th>光10G</th><th>H5G</th>
+          <th>Gカ</th><th>Rカ</th><th>Pカ</th><th>Uカ</th>
+          <th>SLS</th><th>詐欺B</th><th>VB</th><th>あんS</th>
+          <th>電気</th>
+        </tr></thead>
+        <tbody id="monthBody"></tbody>
+        <tfoot id="monthFoot"></tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 一覧タブ ====== -->
+<div id="tab-list" class="tab">
+  <div class="card">
+    <div class="card-title">🔍 絞り込み</div>
+    <div class="filter-row">
+      <div class="form-group">
+        <label>報告者</label>
+        <select id="filterName" style="padding:8px;border:1.5px solid var(--gray-200);border-radius:6px;font-size:14px;"><option value="">全員</option></select>
+      </div>
+      <div class="form-group">
+        <label>開始日</label>
+        <input type="date" id="filterFrom">
+      </div>
+      <div class="form-group">
+        <label>終了日</label>
+        <input type="date" id="filterTo">
+      </div>
+      <button class="btn btn-primary" onclick="applyFilter()">検索</button>
+      <button class="btn btn-outline" onclick="clearFilter()">クリア</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between;">
+      <span>📋 実績一覧 (<span id="resultCount">0</span>件)</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-success" onclick="exportCSV()">📥 CSV出力</button>
+        <button class="btn btn-outline" onclick="exportJSON()" style="font-size:13px;">💾 データ保存</button>
+        <label class="btn btn-outline" style="font-size:13px;cursor:pointer;">📂 データ読込<input type="file" accept=".json" onchange="importJSON(event)" style="display:none;"></label>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>日付</th><th>報告者</th><th>着座</th><th>興味</th><th>成約</th><th>興味率</th><th>成約率</th><th>ｸﾛｰｼﾞﾝｸﾞ率</th>
+          <th>MNP</th><th>新規</th><th>機変</th>
+          <th>光1G</th><th>光10G</th><th>H5G</th>
+          <th>Gカ</th><th>Rカ</th><th>Pカ</th><th>Uカ</th>
+          <th>SLS</th><th>詐欺B</th><th>VB</th><th>あんS</th>
+          <th>電気</th>
+          <th>操作</th>
+        </tr></thead>
+        <tbody id="listBody"></tbody>
+      </table>
+    </div>
+    <div id="listEmpty" class="empty-state hidden"><div class="icon">📭</div><p>該当するデータがありません</p></div>
+  </div>
+</div>
+
+<!-- ====== 集計タブ ====== -->
+<div id="tab-summary" class="tab">
+  <div class="summary-row" id="summaryCards"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <div class="card-title">📊 日別決定率推移</div>
+      <div style="height:200px;display:flex;align-items:flex-end;gap:8px;padding:0 4px;" id="dailyChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏆 契約決定ランキング</div>
+      <ul style="list-style:none;" id="rankingList"></ul>
+      <div id="rankingEmpty" class="empty-state hidden" style="padding:24px;"><p>データがありません</p></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📂 項目別合計</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>項目</th><th>件数合計</th></tr></thead>
+        <tbody id="itemBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== Field Definitions ==========
+const FIELDS = [
+  ['chakuza','着座数'],
+  ['kyomi','興味づけ数'],
+  ['kettei','成約数'],
+  ['mnp','MNP'],
+  ['shinki','新規'],
+  ['kihen','機変'],
+  ['hikari1','光1GB'],
+  ['hikari10','光10GB'],
+  ['h5g','H5G'],
+  ['gcard','Gカード'],
+  ['rcard','Rカード'],
+  ['pcard','Pカード'],
+  ['ucard','Uカード'],
+  ['sls','SLS系'],
+  ['sagibuster','詐欺バスター'],
+  ['virusbuster','ウイルスバスター'],
+  ['anseki','あんセキS'],
+  ['denki','でんき'],
+];
+
+// ========== Rate Calculation ==========
+function calcRate() {
+  const chakuza = Number(document.getElementById('f_chakuza').value) || 0;
+  const kyomi = Number(document.getElementById('f_kyomi').value) || 0;
+  const kettei = Number(document.getElementById('f_kettei').value) || 0;
+  const kyomiRate = chakuza > 0 ? ((kyomi / chakuza) * 100).toFixed(1) : '0.0';
+  const rate = chakuza > 0 ? ((kettei / chakuza) * 100).toFixed(1) : '0.0';
+  const closeRate = kyomi > 0 ? ((kettei / kyomi) * 100).toFixed(1) : '0.0';
+  document.getElementById('kyomiRateDisplay').textContent = kyomiRate + '%';
+  document.getElementById('rateDisplay').textContent = rate + '%';
+  document.getElementById('closeRateDisplay').textContent = closeRate + '%';
+}
+
+function getRate(num, den) {
+  return den > 0 ? ((num / den) * 100).toFixed(1) + '%' : '-';
+}
+
+// ========== Google Sheets ==========
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbx6eVYlDBOQUxafPBiZrWWFe99-dJ9LWTRD5vDDI4WItr83jCwLP1bNzCknxicYUBk/exec';
+const SHEET_NAME = '検証実験';
+
+function sendToSheet(d) {
+  const headers = ['日付','報告者','着座数','興味づけ数','成約数','興味づけ率','成約率','クロージング率',
+    'MNP','新規','機変','光1GB','光10GB','H5G',
+    'Gカード','Rカード','Pカード','Uカード',
+    'SLS系','詐欺バスター','ウイルスバスター','あんセキS',
+    'でんき','備考','改善点'];
+  const v = k => d[k]||0;
+  const kyomiRate = getRate(v('kyomi'), v('chakuza'));
+  const rate = getRate(v('kettei'), v('chakuza'));
+  const closeRate = getRate(v('kettei'), v('kyomi'));
+  const row = [d.date, d.name, v('chakuza'), v('kyomi'), v('kettei'), kyomiRate, rate, closeRate,
+    v('mnp'), v('shinki'), v('kihen'), v('hikari1'), v('hikari10'), v('h5g'),
+    v('gcard'), v('rcard'), v('pcard'), v('ucard'),
+    v('sls'), v('sagibuster'), v('virusbuster'), v('anseki'),
+    v('denki'),
+    d.memo||'', d.kaizen||''];
+  fetch(GAS_URL, {
+    method:'POST', mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ sheetName: SHEET_NAME, headers: headers, row: row })
+  }).catch(err => console.log('Sheet送信エラー:', err));
+}
+
+// ========== Data ==========
+let reports = [];
+try { reports = JSON.parse(localStorage.getItem('kensho') || '[]'); } catch(e) {}
+let filteredData = [];
+let editingId = null;
+
+function save() { try { localStorage.setItem('kensho', JSON.stringify(reports)); } catch(e) {} }
+
+// ========== Init ==========
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('reportDate').value = new Date().toISOString().slice(0,10);
+  buildMonthSelect();
+  updateAll();
+});
+
+// ========== Tabs ==========
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.nav button').forEach((b,i) => {
+    b.classList.toggle('active', ['input','monthly','list','summary'][i] === tab);
+  });
+  if (tab === 'monthly') updateMonthly();
+  if (tab === 'list') applyFilter();
+  if (tab === 'summary') updateSummary();
+}
+
+function toggleSection(el) {
+  el.classList.toggle('collapsed');
+  el.nextElementSibling.classList.toggle('collapsed');
+}
+
+// ========== Form ==========
+function getVal(id) { return Number(document.getElementById('f_' + id)?.value) || 0; }
+
+function collectData() {
+  const d = { id: Date.now() };
+  d.name = document.getElementById('reporterName').value.trim();
+  d.date = document.getElementById('reportDate').value;
+  d.memo = document.getElementById('memo').value.trim();
+  d.kaizen = document.getElementById('kaizen').value.trim();
+  FIELDS.forEach(([id]) => { d[id] = getVal(id); });
+  return d;
+}
+
+function submitReport(e) {
+  e.preventDefault();
+  const d = collectData();
+  if (!d.name || !d.date) return;
+  if (editingId) {
+    const idx = reports.findIndex(r => r.id === editingId);
+    if (idx !== -1) { d.id = editingId; reports[idx] = d; }
+    editingId = null;
+    document.getElementById('submitBtn').textContent = '✅ 報告を登録';
+    showToast('✏️ 報告を更新しました！');
+  } else {
+    reports.push(d);
+    sendToSheet(d);
+    showToast('✅ 報告を登録しました！');
+  }
+  save();
+  resetForm();
+  document.getElementById('reportDate').value = new Date().toISOString().slice(0,10);
+  updateAll();
+  applyFilter();
+}
+
+function resetForm() {
+  editingId = null;
+  document.getElementById('reportForm').reset();
+  document.getElementById('reportDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('previewArea').classList.add('hidden');
+  document.getElementById('submitBtn').textContent = '✅ 報告を登録';
+  document.getElementById('kyomiRateDisplay').textContent = '0.0%';
+  document.getElementById('rateDisplay').textContent = '0.0%';
+  document.getElementById('closeRateDisplay').textContent = '0.0%';
+}
+
+function editReport(id) {
+  const r = reports.find(x => x.id === id);
+  if (!r) return;
+  editingId = id;
+  document.getElementById('reporterName').value = r.name || '';
+  document.getElementById('reportDate').value = r.date || '';
+  document.getElementById('memo').value = r.memo || '';
+  document.getElementById('kaizen').value = r.kaizen || '';
+  FIELDS.forEach(([fid]) => {
+    const el = document.getElementById('f_' + fid);
+    if (el) el.value = r[fid] || '';
+  });
+  calcRate();
+  document.getElementById('submitBtn').textContent = '✏️ 報告を更新';
+  switchTab('input');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function deleteReport(id) {
+  if (!confirm('この報告を削除してもよいですか？')) return;
+  reports = reports.filter(r => r.id !== id);
+  save(); updateAll(); applyFilter();
+}
+
+// ========== Text Preview ==========
+function buildText(d) {
+  const n = (v) => v || 0;
+  const chakuza = n(d.chakuza);
+  const kyomi = n(d.kyomi);
+  const kettei = n(d.kettei);
+  const kyomiRate = getRate(kyomi, chakuza);
+  const rate = getRate(kettei, chakuza);
+  const closeRate = getRate(kettei, kyomi);
+  let t = `検証実験●日別実績\n`;
+  t += `着座数:${chakuza}件\n`;
+  t += `興味づけ数:${kyomi}件\n`;
+  t += `成約数:${kettei}件\n`;
+  t += `興味づけ率:${kyomiRate}（興味づけ÷着座）\n`;
+  t += `成約率:${rate}（成約÷着座）\n`;
+  t += `クロージング率:${closeRate}（成約÷興味づけ）\n\n`;
+  t += `MNP:${n(d.mnp)}件\n`;
+  t += `新規：${n(d.shinki)}件\n`;
+  t += `機変：${n(d.kihen)}件\n`;
+  t += `光1GB：${n(d.hikari1)}件\n`;
+  t += `光10GB：${n(d.hikari10)}件\n`;
+  t += `H5G：${n(d.h5g)}件\n`;
+  t += `Gカード：${n(d.gcard)}件\n`;
+  t += `Rカード：${n(d.rcard)}件、Pカード：${n(d.pcard)}件、Uカード：${n(d.ucard)}件\n`;
+  t += `SLS系：${n(d.sls)}件、詐欺バスター：${n(d.sagibuster)}件、ウイルスバスター：${n(d.virusbuster)}件、あんセキS：${n(d.anseki)}件\n`;
+  t += `でんき:${n(d.denki)}件`;
+  if (d.kaizen) t += `\n\n【改善点】\n${d.kaizen}`;
+  return t;
+}
+
+function previewText() {
+  const d = collectData();
+  document.getElementById('previewText').textContent = buildText(d);
+  document.getElementById('previewArea').classList.remove('hidden');
+}
+
+function copyPreview() {
+  navigator.clipboard.writeText(document.getElementById('previewText').textContent)
+    .then(() => showToast('📋 コピーしました！'));
+}
+
+// ========== Recent ==========
+function updateRecent() {
+  const sorted = [...reports].sort((a,b) => b.id - a.id).slice(0,5);
+  const body = document.getElementById('recentBody');
+  const empty = document.getElementById('recentEmpty');
+  if (!sorted.length) { body.innerHTML=''; empty.classList.remove('hidden'); return; }
+  empty.classList.add('hidden');
+  body.innerHTML = sorted.map(r => {
+    const v = k => r[k]||0;
+    const hikari = v('hikari1') + v('hikari10');
+    const card = v('gcard') + v('rcard') + v('pcard') + v('ucard');
+    const kyomiRate = getRate(v('kyomi'), v('chakuza'));
+    const rate = getRate(v('kettei'), v('chakuza'));
+    return `<tr>
+      <td>${r.date}</td><td>${esc(r.name)}</td>
+      <td class="text-c">${v('chakuza')}</td>
+      <td class="text-c">${v('kyomi')}</td>
+      <td class="text-c fw-b">${v('kettei')}</td>
+      <td class="text-c" style="color:var(--primary);">${kyomiRate}</td>
+      <td class="text-c fw-b" style="color:var(--accent);">${rate}</td>
+      <td class="text-c">${v('mnp')}</td>
+      <td class="text-c">${v('shinki')}</td>
+      <td class="text-c">${v('kihen')}</td>
+      <td class="text-c">${hikari}</td>
+      <td class="text-c">${card}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ========== Name List ==========
+function updateNameList() {
+  const names = [...new Set(reports.map(r => r.name))].sort();
+  document.getElementById('nameList').innerHTML = names.map(n => `<option value="${esc(n)}">`).join('');
+  ['filterName','monthName'].forEach(selId => {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">全員</option>' + names.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+    sel.value = cur;
+  });
+}
+
+// ========== Filter & List ==========
+function applyFilter() {
+  const name = document.getElementById('filterName').value;
+  const from = document.getElementById('filterFrom').value;
+  const to = document.getElementById('filterTo').value;
+  filteredData = reports.filter(r => {
+    if (name && r.name !== name) return false;
+    if (from && r.date < from) return false;
+    if (to && r.date > to) return false;
+    return true;
+  }).sort((a,b) => b.date.localeCompare(a.date));
+  renderList();
+}
+
+function clearFilter() {
+  document.getElementById('filterName').value='';
+  document.getElementById('filterFrom').value='';
+  document.getElementById('filterTo').value='';
+  applyFilter();
+}
+
+function renderList() {
+  const body = document.getElementById('listBody');
+  const empty = document.getElementById('listEmpty');
+  document.getElementById('resultCount').textContent = filteredData.length;
+  if (!filteredData.length) { body.innerHTML=''; empty.classList.remove('hidden'); return; }
+  empty.classList.add('hidden');
+  body.innerHTML = filteredData.map(r => {
+    const v = k => r[k]||0;
+    const kyomiRate = getRate(v('kyomi'), v('chakuza'));
+    const rate = getRate(v('kettei'), v('chakuza'));
+    const closeRate = getRate(v('kettei'), v('kyomi'));
+    return `<tr>
+      <td>${r.date}</td><td>${esc(r.name)}</td>
+      <td class="text-c">${v('chakuza')}</td>
+      <td class="text-c">${v('kyomi')}</td>
+      <td class="text-c fw-b">${v('kettei')}</td>
+      <td class="text-c" style="color:var(--primary);">${kyomiRate}</td>
+      <td class="text-c fw-b" style="color:var(--accent);">${rate}</td>
+      <td class="text-c">${closeRate}</td>
+      <td class="text-c">${v('mnp')}</td>
+      <td class="text-c">${v('shinki')}</td>
+      <td class="text-c">${v('kihen')}</td>
+      <td class="text-c">${v('hikari1')}</td>
+      <td class="text-c">${v('hikari10')}</td>
+      <td class="text-c">${v('h5g')}</td>
+      <td class="text-c">${v('gcard')}</td>
+      <td class="text-c">${v('rcard')}</td>
+      <td class="text-c">${v('pcard')}</td>
+      <td class="text-c">${v('ucard')}</td>
+      <td class="text-c">${v('sls')}</td>
+      <td class="text-c">${v('sagibuster')}</td>
+      <td class="text-c">${v('virusbuster')}</td>
+      <td class="text-c">${v('anseki')}</td>
+      <td class="text-c">${v('denki')}</td>
+      <td style="display:flex;gap:4px;"><button class="btn btn-outline" style="font-size:12px;padding:6px 10px;" onclick="editReport(${r.id})">編集</button><button class="btn btn-danger" onclick="deleteReport(${r.id})">削除</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ========== CSV ==========
+function exportCSV() {
+  if (!filteredData.length) { alert('出力するデータがありません'); return; }
+  const bom = '\uFEFF';
+  const cols = ['日付','報告者','着座数','興味づけ数','成約数','興味づけ率','成約率','クロージング率',
+    'MNP','新規','機変','光1GB','光10GB','H5G',
+    'Gカード','Rカード','Pカード','Uカード',
+    'SLS系','詐欺バスター','ウイルスバスター','あんセキS',
+    'でんき','備考','改善点'];
+  const header = cols.join(',') + '\n';
+  const rows = filteredData.map(r => {
+    const v = k => r[k]||0;
+    const kyomiRate = getRate(v('kyomi'), v('chakuza'));
+    const rate = getRate(v('kettei'), v('chakuza'));
+    const closeRate = getRate(v('kettei'), v('kyomi'));
+    return [r.date, csvSafe(r.name), v('chakuza'), v('kyomi'), v('kettei'), kyomiRate, rate, closeRate,
+      v('mnp'), v('shinki'), v('kihen'), v('hikari1'), v('hikari10'), v('h5g'),
+      v('gcard'), v('rcard'), v('pcard'), v('ucard'),
+      v('sls'), v('sagibuster'), v('virusbuster'), v('anseki'),
+      v('denki'),
+      csvSafe(r.memo), csvSafe(r.kaizen)].join(',');
+  }).join('\n');
+  const blob = new Blob([bom + header + rows], { type:'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `検証実験_実績_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('📥 CSVを出力しました！');
+}
+function csvSafe(s) { if(!s)return''; return s.includes(',')||s.includes('"')||s.includes('\n') ? '"'+s.replace(/"/g,'""')+'"' : s; }
+
+// ========== Summary ==========
+function updateSummary() {
+  if (!reports.length) {
+    document.getElementById('summaryCards').innerHTML='';
+    document.getElementById('dailyChart').innerHTML='<div class="empty-state" style="width:100%;"><p>データがありません</p></div>';
+    document.getElementById('rankingList').innerHTML='';
+    document.getElementById('rankingEmpty').classList.remove('hidden');
+    document.getElementById('itemBody').innerHTML='';
+    return;
+  }
+  const sum = k => reports.reduce((s,r) => s + (r[k]||0), 0);
+  const tChakuza = sum('chakuza'), tKyomi = sum('kyomi'), tKettei = sum('kettei');
+  const tKyomiRate = getRate(tKyomi, tChakuza);
+  const tRate = getRate(tKettei, tChakuza);
+  const tCloseRate = getRate(tKettei, tKyomi);
+  const tMnp = sum('mnp'), tShinki = sum('shinki'), tKihen = sum('kihen');
+  const tHikari = sum('hikari1') + sum('hikari10');
+  const tCard = sum('gcard') + sum('rcard') + sum('pcard') + sum('ucard');
+
+  document.getElementById('summaryCards').innerHTML = `
+    <div class="summary-card"><div class="label">総着座数</div><div class="value">${tChakuza}</div><div class="sub">${reports.length}日分</div></div>
+    <div class="summary-card"><div class="label">総興味づけ</div><div class="value">${tKyomi}</div><div class="sub">件</div></div>
+    <div class="summary-card"><div class="label">総成約数</div><div class="value">${tKettei}</div><div class="sub">件</div></div>
+    <div class="summary-card highlight"><div class="label">興味づけ率</div><div class="value">${tKyomiRate}</div><div class="sub">興味 ÷ 着座</div></div>
+    <div class="summary-card highlight"><div class="label">成約率</div><div class="value">${tRate}</div><div class="sub">成約 ÷ 着座</div></div>
+    <div class="summary-card"><div class="label">クロージング率</div><div class="value">${tCloseRate}</div><div class="sub">成約 ÷ 興味</div></div>
+    <div class="summary-card"><div class="label">MNP</div><div class="value">${tMnp}</div><div class="sub">件</div></div>
+    <div class="summary-card"><div class="label">新規</div><div class="value">${tShinki}</div><div class="sub">件</div></div>
+    <div class="summary-card"><div class="label">機変</div><div class="value">${tKihen}</div><div class="sub">件</div></div>
+    <div class="summary-card"><div class="label">光合計</div><div class="value">${tHikari}</div><div class="sub">件</div></div>
+    <div class="summary-card"><div class="label">カード合計</div><div class="value">${tCard}</div><div class="sub">件</div></div>
+  `;
+
+  // Daily chart - show rate trend
+  const byDate = {};
+  reports.forEach(r => {
+    if (!byDate[r.date]) byDate[r.date] = { chakuza:0, kettei:0 };
+    byDate[r.date].chakuza += (r.chakuza||0);
+    byDate[r.date].kettei += (r.kettei||0);
+  });
+  const dates = Object.keys(byDate).sort().slice(-10);
+  const rates = dates.map(d => byDate[d].chakuza > 0 ? (byDate[d].kettei / byDate[d].chakuza * 100) : 0);
+  const maxRate = Math.max(...rates, 1);
+  document.getElementById('dailyChart').innerHTML = dates.map((d,i) => {
+    const h = Math.max((rates[i]/maxRate)*160, 4);
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:36px;">
+      <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px;">${rates[i].toFixed(1)}%</div>
+      <div style="width:100%;max-width:40px;height:${h}px;background:linear-gradient(180deg,#7c3aed,#a78bfa);border-radius:4px 4px 0 0;"></div>
+      <div style="font-size:10px;color:var(--gray-500);margin-top:4px;">${d.slice(5)}</div>
+    </div>`;
+  }).join('');
+
+  // Ranking by kettei
+  const byName = {};
+  reports.forEach(r => {
+    if (!byName[r.name]) byName[r.name] = { kettei:0, chakuza:0 };
+    byName[r.name].kettei += (r.kettei||0);
+    byName[r.name].chakuza += (r.chakuza||0);
+  });
+  const ranked = Object.entries(byName).sort((a,b) => b[1].kettei - a[1].kettei).slice(0,10);
+  const re = document.getElementById('rankingEmpty');
+  if (!ranked.length) { document.getElementById('rankingList').innerHTML=''; re.classList.remove('hidden'); }
+  else {
+    re.classList.add('hidden');
+    const bc = {0:'background:#fef3c7;color:#d97706;',1:'background:#e5e7eb;color:#4b5563;',2:'background:#fed7aa;color:#ea580c;'};
+    document.getElementById('rankingList').innerHTML = ranked.map((r,i) => {
+      const s = bc[i]||'background:var(--gray-100);color:var(--gray-500);';
+      const nameRate = getRate(r[1].kettei, r[1].chakuza);
+      return `<li style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+        <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;${s}">${i+1}</div>
+        <div style="flex:1;font-weight:600;">${esc(r[0])}</div>
+        <div style="font-weight:700;color:var(--primary);">${r[1].kettei}件</div>
+        <div style="font-size:12px;color:var(--accent);font-weight:600;">(${nameRate})</div>
+      </li>`;
+    }).join('');
+  }
+
+  // Item totals
+  const displayItems = FIELDS.filter(f => !f[0].startsWith('mnp_'));
+  document.getElementById('itemBody').innerHTML = displayItems.map(([id, label]) => {
+    return `<tr><td>${label.trim()}</td><td class="text-c fw-b">${sum(id)}</td></tr>`;
+  }).join('');
+}
+
+// ========== Monthly ==========
+function buildMonthSelect() {
+  const sel = document.getElementById('monthSelect');
+  const now = new Date();
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const val = d.toISOString().slice(0,7);
+    sel.innerHTML += `<option value="${val}">${d.getFullYear()}年${d.getMonth()+1}月</option>`;
+  }
+}
+
+function updateMonthly() {
+  const month = document.getElementById('monthSelect').value;
+  const nameFilter = document.getElementById('monthName').value;
+  const mReports = reports.filter(r => {
+    if (!r.date.startsWith(month)) return false;
+    if (nameFilter && r.name !== nameFilter) return false;
+    return true;
+  }).sort((a,b) => a.date.localeCompare(b.date));
+
+  const sum = k => mReports.reduce((s,r) => s + (r[k]||0), 0);
+
+  const tChakuza = sum('chakuza'), tKyomi = sum('kyomi'), tKettei = sum('kettei');
+  const tKyomiRate = getRate(tKyomi, tChakuza);
+  const tRate = getRate(tKettei, tChakuza);
+  const tCloseRate = getRate(tKettei, tKyomi);
+  const hikari = sum('hikari1') + sum('hikari10');
+  const card = sum('gcard') + sum('rcard') + sum('pcard') + sum('ucard');
+  document.getElementById('monthSummary').innerHTML = mReports.length ? `
+    <div class="summary-card"><div class="label">着座合計</div><div class="value">${tChakuza}</div><div class="sub">${mReports.length}日分</div></div>
+    <div class="summary-card"><div class="label">興味づけ合計</div><div class="value">${tKyomi}</div><div class="sub">件</div></div>
+    <div class="summary-card"><div class="label">成約合計</div><div class="value">${tKettei}</div><div class="sub">件</div></div>
+    <div class="summary-card highlight"><div class="label">月間興味づけ率</div><div class="value">${tKyomiRate}</div><div class="sub">興味 ÷ 着座</div></div>
+    <div class="summary-card highlight"><div class="label">月間成約率</div><div class="value">${tRate}</div><div class="sub">成約 ÷ 着座</div></div>
+    <div class="summary-card"><div class="label">クロージング率</div><div class="value">${tCloseRate}</div><div class="sub">成約 ÷ 興味</div></div>
+    <div class="summary-card"><div class="label">MNP</div><div class="value">${sum('mnp')}</div><div class="sub">件</div></div>
+    <div class="summary-card"><div class="label">新規</div><div class="value">${sum('shinki')}</div><div class="sub">件</div></div>
+    <div class="summary-card"><div class="label">機変</div><div class="value">${sum('kihen')}</div><div class="sub">件</div></div>
+    <div class="summary-card"><div class="label">光合計</div><div class="value">${hikari}</div><div class="sub">件</div></div>
+    <div class="summary-card"><div class="label">カード合計</div><div class="value">${card}</div><div class="sub">件</div></div>
+  ` : '';
+
+  const v = (r,k) => r[k]||0;
+  document.getElementById('monthBody').innerHTML = mReports.map(r => {
+    const kyomiRate = getRate(v(r,'kyomi'), v(r,'chakuza'));
+    const rate = getRate(v(r,'kettei'), v(r,'chakuza'));
+    const closeRate = getRate(v(r,'kettei'), v(r,'kyomi'));
+    return `<tr>
+    <td>${r.date}</td><td>${esc(r.name)}</td>
+    <td class="text-c">${v(r,'chakuza')}</td>
+    <td class="text-c">${v(r,'kyomi')}</td>
+    <td class="text-c fw-b">${v(r,'kettei')}</td>
+    <td class="text-c" style="color:var(--primary);">${kyomiRate}</td>
+    <td class="text-c fw-b" style="color:var(--accent);">${rate}</td>
+    <td class="text-c">${closeRate}</td>
+    <td class="text-c">${v(r,'mnp')}</td><td class="text-c">${v(r,'shinki')}</td><td class="text-c">${v(r,'kihen')}</td>
+    <td class="text-c">${v(r,'hikari1')}</td><td class="text-c">${v(r,'hikari10')}</td><td class="text-c">${v(r,'h5g')}</td>
+    <td class="text-c">${v(r,'gcard')}</td><td class="text-c">${v(r,'rcard')}</td><td class="text-c">${v(r,'pcard')}</td><td class="text-c">${v(r,'ucard')}</td>
+    <td class="text-c">${v(r,'sls')}</td><td class="text-c">${v(r,'sagibuster')}</td><td class="text-c">${v(r,'virusbuster')}</td><td class="text-c">${v(r,'anseki')}</td>
+    <td class="text-c">${v(r,'denki')}</td>
+  </tr>`;
+  }).join('');
+
+  document.getElementById('monthFoot').innerHTML = mReports.length ? `<tr style="font-weight:700;background:var(--gray-50);">
+    <td colspan="2">累計</td>
+    <td class="text-c">${tChakuza}</td>
+    <td class="text-c">${tKyomi}</td>
+    <td class="text-c">${tKettei}</td>
+    <td class="text-c" style="color:var(--primary);">${tKyomiRate}</td>
+    <td class="text-c" style="color:var(--accent);">${tRate}</td>
+    <td class="text-c">${tCloseRate}</td>
+    <td class="text-c">${sum('mnp')}</td><td class="text-c">${sum('shinki')}</td><td class="text-c">${sum('kihen')}</td>
+    <td class="text-c">${sum('hikari1')}</td><td class="text-c">${sum('hikari10')}</td><td class="text-c">${sum('h5g')}</td>
+    <td class="text-c">${sum('gcard')}</td><td class="text-c">${sum('rcard')}</td><td class="text-c">${sum('pcard')}</td><td class="text-c">${sum('ucard')}</td>
+    <td class="text-c">${sum('sls')}</td><td class="text-c">${sum('sagibuster')}</td><td class="text-c">${sum('virusbuster')}</td><td class="text-c">${sum('anseki')}</td>
+    <td class="text-c">${sum('denki')}</td>
+  </tr>` : '';
+}
+
+// ========== JSON Export/Import ==========
+function exportJSON() {
+  if (!reports.length) { alert('保存するデータがありません'); return; }
+  const blob = new Blob([JSON.stringify(reports, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `検証実験_データ_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showToast('💾 データを保存しました！');
+}
+
+function importJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data)) { alert('無効なデータ形式です'); return; }
+      const mode = confirm(`${data.length}件のデータが見つかりました。\n\n[OK] 既存データに追加\n[キャンセル] 既存データを置き換え`);
+      if (mode) {
+        const existIds = new Set(reports.map(r => r.id));
+        const newData = data.filter(r => !existIds.has(r.id));
+        reports = [...reports, ...newData];
+        showToast(`📂 ${newData.length}件を追加しました！`);
+      } else {
+        reports = data;
+        showToast(`📂 ${data.length}件で置き換えました！`);
+      }
+      save(); updateAll(); applyFilter();
+    } catch(err) { alert('ファイルの読み込みに失敗しました: ' + err.message); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ========== Utility ==========
+function esc(s) { if(!s)return''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+function updateAll() { updateRecent(); updateNameList(); }
+</script>
+</body>
+</html>
