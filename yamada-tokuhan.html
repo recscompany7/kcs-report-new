@@ -67,6 +67,9 @@
   .field-row.sub { grid-template-columns:40px 120px 80px; padding-left:12px; }
   .field-row.single { grid-template-columns:160px 80px; }
   .field-row.wide { grid-template-columns:160px 80px 100px; }
+  .field-row.b4 { grid-template-columns:minmax(0,1fr) 68px 68px 84px; }
+  .bonus-input { border-color:#f59e0b !important; background:#fffbeb !important; }
+  .bonus-note { font-size:11px; color:#b45309; background:#fffbeb; border:1px solid #fcd34d; border-radius:6px; padding:6px 8px; margin:6px 0 8px; line-height:1.5; }
 
   .field-label { font-size:13px; font-weight:600; color:var(--gray-600); white-space:nowrap; }
   .field-label.sub-label { color:var(--gray-400); font-size:12px; }
@@ -151,7 +154,7 @@
 
 <div class="header">
   <h1>📊 ヤマダ電機特販 実績報告</h1>
-  <p>日別入力 ＋ 月間累積 — ポイント自動計算・進捗率つき</p>
+  <p>日別入力 ＋ 月間累積 — ポイント自動計算・進捗率つき<br><span style="font-size:11px;opacity:0.8;">26年度8月期 特販評価制度（全国閾値適用）対応版</span></p>
 </div>
 
 <div class="nav">
@@ -207,64 +210,96 @@
     <div class="section">
       <div class="section-header" onclick="toggleSection(this)">⭐ ポイント獲得項目 <span class="arrow">▼</span></div>
       <div class="section-body">
-        <div class="field-row wide">
+        <div class="bonus-note">🎁 <strong>光＋dカード同時成約ボーナス</strong>（26年度8月期〜）<br>光1G/光10G/H5G・G/GU/Pカードのうち<strong>同時成約した件数</strong>を「うち同時」欄に入力すると、その件数分だけ <strong>pt×1.5</strong> で計算されます。<br>例）光1G 2件のうち1件が同時成約 → 8pt + 12pt = 20pt</div>
+        <div class="field-row b4">
           <div class="field-label"></div>
           <div class="col-header">件数</div>
+          <div class="col-header">うち同時</div>
           <div class="col-header">合計pt</div>
         </div>
-        <div class="field-row wide">
-          <div class="field-label">新規 <span class="pt-badge">5pt</span></div>
+        <div class="field-row b4">
+          <div class="field-label">純粋新規 <span class="pt-badge">6pt</span></div>
           <input class="num-input" type="number" min="0" id="f_shinki" placeholder="0" oninput="calcPt()">
+          <div></div>
           <div class="pt-display" id="pt_shinki">0pt</div>
         </div>
-        <div class="field-row wide">
-          <div class="field-label">機変 <span class="pt-badge">7pt</span></div>
+        <div class="field-row b4">
+          <div class="field-label">純粋新規(SIMのみ) <span class="pt-badge">3pt</span></div>
+          <input class="num-input" type="number" min="0" id="f_shinki_sim" placeholder="0" oninput="calcPt()">
+          <div></div>
+          <div class="pt-display" id="pt_shinki_sim">0pt</div>
+        </div>
+        <div class="field-row b4">
+          <div class="field-label">取替(機変) <span class="pt-badge">7pt</span></div>
           <input class="num-input" type="number" min="0" id="f_kihen" placeholder="0" oninput="calcPt()">
+          <div></div>
           <div class="pt-display" id="pt_kihen">0pt</div>
         </div>
-        <div class="field-row wide">
+        <div class="field-row b4">
           <div class="field-label">光1GB <span class="pt-badge">8pt</span></div>
           <input class="num-input" type="number" min="0" id="f_hikari1" placeholder="0" oninput="calcPt()">
+          <input class="num-input bonus-input" type="number" min="0" id="f_hikari1_b" placeholder="0" oninput="calcPt()">
           <div class="pt-display" id="pt_hikari1">0pt</div>
         </div>
-        <div class="field-row wide">
+        <div class="field-row b4">
           <div class="field-label">光10GB <span class="pt-badge">10pt</span></div>
           <input class="num-input" type="number" min="0" id="f_hikari10" placeholder="0" oninput="calcPt()">
+          <input class="num-input bonus-input" type="number" min="0" id="f_hikari10_b" placeholder="0" oninput="calcPt()">
           <div class="pt-display" id="pt_hikari10">0pt</div>
         </div>
-        <div class="field-row wide">
+        <div class="field-row b4">
           <div class="field-label">H5G <span class="pt-badge">6pt</span></div>
           <input class="num-input" type="number" min="0" id="f_h5g" placeholder="0" oninput="calcPt()">
+          <input class="num-input bonus-input" type="number" min="0" id="f_h5g_b" placeholder="0" oninput="calcPt()">
           <div class="pt-display" id="pt_h5g">0pt</div>
         </div>
-        <div class="field-row wide">
+        <div class="field-row b4">
           <div class="field-label">Gカード <span class="pt-badge">3pt</span></div>
           <input class="num-input" type="number" min="0" id="f_gcard" placeholder="0" oninput="calcPt()">
+          <input class="num-input bonus-input" type="number" min="0" id="f_gcard_b" placeholder="0" oninput="calcPt()">
           <div class="pt-display" id="pt_gcard">0pt</div>
         </div>
-        <div class="field-row wide">
+        <div class="field-row b4">
           <div class="field-label">GUカード <span class="pt-badge">3pt</span></div>
           <input class="num-input" type="number" min="0" id="f_gucard" placeholder="0" oninput="calcPt()">
+          <input class="num-input bonus-input" type="number" min="0" id="f_gucard_b" placeholder="0" oninput="calcPt()">
           <div class="pt-display" id="pt_gucard">0pt</div>
         </div>
-        <div class="field-row wide">
-          <div class="field-label">Pカード <span class="pt-badge">3pt</span></div>
+        <div class="field-row b4">
+          <div class="field-label">Pカード <span class="pt-badge">4pt</span></div>
           <input class="num-input" type="number" min="0" id="f_pcard" placeholder="0" oninput="calcPt()">
+          <input class="num-input bonus-input" type="number" min="0" id="f_pcard_b" placeholder="0" oninput="calcPt()">
           <div class="pt-display" id="pt_pcard">0pt</div>
         </div>
-        <div class="field-row single">
+        <div class="field-row b4">
           <div class="field-label">Rカード <span class="pt-badge" style="background:#f3f4f6;color:var(--gray-500);">0pt</span></div>
           <input class="num-input" type="number" min="0" id="f_rcard" placeholder="0">
+          <div></div>
+          <div></div>
         </div>
-        <div class="field-row wide">
+        <div class="field-row b4">
           <div class="field-label">でんき <span class="pt-badge">2pt</span></div>
           <input class="num-input" type="number" min="0" id="f_denki" placeholder="0" oninput="calcPt()">
+          <div></div>
           <div class="pt-display" id="pt_denki">0pt</div>
         </div>
-        <div class="field-row wide">
+        <div class="field-row b4">
           <div class="field-label">登録 <span class="pt-badge">1pt</span></div>
           <input class="num-input" type="number" min="0" id="f_touroku" placeholder="0" oninput="calcPt()">
+          <div></div>
           <div class="pt-display" id="pt_touroku">0pt</div>
+        </div>
+        <div class="field-row b4">
+          <div class="field-label">dバリューパス <span class="pt-badge">0.5pt</span></div>
+          <input class="num-input" type="number" min="0" id="f_dvalue" placeholder="0" oninput="calcPt()">
+          <div></div>
+          <div class="pt-display" id="pt_dvalue">0pt</div>
+        </div>
+        <div class="field-row b4" style="border-top:1px solid var(--gray-200);margin-top:4px;padding-top:8px;">
+          <div class="field-label" style="color:#b45309;">🎁 同時成約ボーナス加算</div>
+          <div></div>
+          <div></div>
+          <div class="pt-display" id="pt_bonus" style="background:#fffbeb;color:#b45309;">0pt</div>
         </div>
       </div>
     </div>
@@ -359,10 +394,10 @@
     <div class="table-wrap" style="margin-top:16px;">
       <table>
         <thead><tr>
-          <th>日付</th><th>報告者</th><th>MNP</th><th>新規</th><th>機変</th>
+          <th>日付</th><th>報告者</th><th>MNP</th><th>新規</th><th>新規SIM</th><th>取替</th>
           <th>光1G</th><th>光10G</th><th>H5G</th>
           <th>Gカ</th><th>GUカ</th><th>Pカ</th><th>Rカ</th>
-          <th>電気</th><th>登録</th><th>日計pt</th><th>ノルマ</th>
+          <th>電気</th><th>登録</th><th>dバリュー</th><th>🎁同時</th><th>日計pt</th><th>ノルマ</th>
         </tr></thead>
         <tbody id="monthBody"></tbody>
         <tfoot id="monthFoot"></tfoot>
@@ -398,10 +433,10 @@
     <div class="table-wrap">
       <table>
         <thead><tr>
-          <th>日付</th><th>報告者</th><th>MNP</th><th>新規</th><th>機変</th>
+          <th>日付</th><th>報告者</th><th>MNP</th><th>新規</th><th>新規SIM</th><th>取替</th>
           <th>光1G</th><th>光10G</th><th>H5G</th>
           <th>Gカ</th><th>GUカ</th><th>Pカ</th><th>Rカ</th>
-          <th>電気</th><th>登録</th><th>日計pt</th><th>ノルマ</th><th>操作</th>
+          <th>電気</th><th>登録</th><th>dバリュー</th><th>🎁同時</th><th>日計pt</th><th>ノルマ</th><th>操作</th>
         </tr></thead>
         <tbody id="listBody"></tbody>
       </table>
@@ -440,21 +475,29 @@
 
 <script>
 // ========== Point config ==========
+// 26年度8月期特販評価制度（全国閾値適用）準拠
 const PT_ITEMS = [
-  {id:'mnp', label:'MNP', pt:10},
-  {id:'shinki', label:'新規', pt:5},
-  {id:'kihen', label:'機変', pt:7},
-  {id:'hikari1', label:'光1GB', pt:8},
-  {id:'hikari10', label:'光10GB', pt:10},
-  {id:'h5g', label:'H5G', pt:6},
-  {id:'gcard', label:'Gカード', pt:3},
-  {id:'gucard', label:'GUカード', pt:3},
-  {id:'pcard', label:'Pカード', pt:3},
+  {id:'mnp', label:'MNP(PI)', pt:10},
+  {id:'shinki', label:'純粋新規', pt:6},
+  {id:'shinki_sim', label:'純粋新規(SIMのみ)', pt:3},
+  {id:'kihen', label:'取替(機変)', pt:7},
+  {id:'hikari1', label:'光1GB', pt:8, bonus:true},
+  {id:'hikari10', label:'光10GB', pt:10, bonus:true},
+  {id:'h5g', label:'H5G', pt:6, bonus:true},
+  {id:'gcard', label:'Gカード', pt:3, bonus:true},
+  {id:'gucard', label:'GUカード', pt:3, bonus:true},
+  {id:'pcard', label:'Pカード', pt:4, bonus:true},
   {id:'denki', label:'でんき', pt:2},
   {id:'touroku', label:'登録', pt:1},
+  {id:'dvalue', label:'dバリューパス', pt:0.5},
 ];
 const NO_PT_ITEMS = [{id:'rcard', label:'Rカード', pt:0}];
 const ALL_ITEMS = [...PT_ITEMS, ...NO_PT_ITEMS];
+// 光+dカード同時成約ボーナス：該当件数分のみ pt×1.5（＝ +0.5倍 を加算）
+const BONUS_ITEMS = PT_ITEMS.filter(i => i.bonus);
+const BONUS_RATE = 1.5;
+// 0.5pt刻み対応の表示ヘルパー
+function fmtPt(n) { return Math.round(n*100)/100; }
 
 // ========== Google Sheets ==========
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbx6eVYlDBOQUxafPBiZrWWFe99-dJ9LWTRD5vDDI4WItr83jCwLP1bNzCknxicYUBk/exec';
@@ -462,12 +505,15 @@ const SHEET_NAME = 'ヤマダ電機特販';
 
 function sendToSheet(d) {
   const headers = ['日付','報告者','MNP','SB','a','UQ','YM','楽','その他','MNP目標',
-    '新規','機変','光1GB','光10GB','H5G','Gカード','GUカード','Pカード','Rカード','でんき','登録',
+    '純粋新規','純粋新規SIMのみ','取替(機変)','光1GB','光10GB','H5G','Gカード','GUカード','Pカード','Rカード','でんき','登録','dバリューパス',
+    '光1GB同時','光10GB同時','H5G同時','Gカード同時','GUカード同時','Pカード同時','同時成約ボーナスpt',
     '日計pt','ノルマpt','備考','現状の課題点','課題点に対する改善・解決活動'];
   const v = k => d[k]||0;
-  const dayPt = PT_ITEMS.reduce((s,item) => s + (d[item.id]||0) * item.pt, 0);
+  const b = id => bonusCnt(d, PT_ITEMS.find(x=>x.id===id));
+  const dayPt = calcDayPt(d);
   const row = [d.date, d.name, v('mnp'), v('mnp_sb'), v('mnp_a'), v('mnp_uq'), v('mnp_ym'), v('mnp_raku'), v('mnp_other'), v('mnp_target'),
-    v('shinki'), v('kihen'), v('hikari1'), v('hikari10'), v('h5g'), v('gcard'), v('gucard'), v('pcard'), v('rcard'), v('denki'), v('touroku'),
+    v('shinki'), v('shinki_sim'), v('kihen'), v('hikari1'), v('hikari10'), v('h5g'), v('gcard'), v('gucard'), v('pcard'), v('rcard'), v('denki'), v('touroku'), v('dvalue'),
+    b('hikari1'), b('hikari10'), b('h5g'), b('gcard'), b('gucard'), b('pcard'), fmtPt(calcBonusPt(d)),
     dayPt, v('norma'), d.memo||'', d.kadai||'', d.kaizen||''];
   fetch(GAS_URL, {
     method:'POST', mode:'no-cors',
@@ -484,20 +530,41 @@ let editingId = null;
 function save() { try { localStorage.setItem('yamadaTokuhan', JSON.stringify(reports)); } catch(e) {} }
 
 // ========== Calc ==========
+// 同時成約件数（件数を超えないようにクランプ）
+function bonusCnt(r, item) {
+  if (!item.bonus) return 0;
+  return Math.min(Number(r[item.id+'_b'])||0, Number(r[item.id])||0);
+}
+// 1項目の獲得pt（通常分＋ボーナス分）
+function itemPt(r, item) {
+  const c = Number(r[item.id])||0;
+  const b = bonusCnt(r, item);
+  return (c - b) * item.pt + b * item.pt * BONUS_RATE;
+}
+// ボーナスによる加算分のみ
+function calcBonusPt(r) {
+  return BONUS_ITEMS.reduce((s,item) => s + bonusCnt(r,item) * item.pt * (BONUS_RATE - 1), 0);
+}
 function calcDayPt(r) {
-  return PT_ITEMS.reduce((s,item) => s + (r[item.id]||0) * item.pt, 0);
+  return fmtPt(PT_ITEMS.reduce((s,item) => s + itemPt(r,item), 0));
 }
 
 function calcPt() {
+  const r = {};
+  ALL_ITEMS.forEach(item => {
+    r[item.id] = Number(document.getElementById('f_'+item.id)?.value) || 0;
+    if (item.bonus) r[item.id+'_b'] = Number(document.getElementById('f_'+item.id+'_b')?.value) || 0;
+  });
   let total = 0;
   PT_ITEMS.forEach(item => {
-    const v = Number(document.getElementById('f_'+item.id)?.value) || 0;
-    const p = v * item.pt;
+    const p = itemPt(r, item);
     total += p;
     const el = document.getElementById('pt_'+item.id);
-    if (el) el.textContent = p + 'pt';
+    if (el) el.textContent = fmtPt(p) + 'pt';
   });
-  document.getElementById('todayTotalPt').textContent = total;
+  const bEl = document.getElementById('pt_bonus');
+  if (bEl) bEl.textContent = '+' + fmtPt(calcBonusPt(r)) + 'pt';
+  document.getElementById('todayTotalPt').textContent = fmtPt(total);
 }
 
 function getVal(id) { return Number(document.getElementById('f_'+id)?.value) || 0; }
@@ -539,7 +606,11 @@ function collectData() {
   d.mnp_raku = getVal('mnp_raku');
   d.mnp_other = getVal('mnp_other');
   d.mnp_target = getVal('mnp_target');
-  ALL_ITEMS.forEach(item => { d[item.id] = getVal(item.id); });
+  ALL_ITEMS.forEach(item => {
+    d[item.id] = getVal(item.id);
+    if (item.bonus) d[item.id+'_b'] = Math.min(getVal(item.id+'_b'), d[item.id]);
+  });
+  d.bonusPt = calcBonusPt(d);
   d.norma = getVal('norma');
   d.dayPt = calcDayPt(d);
   return d;
@@ -594,6 +665,10 @@ function editReport(id) {
   ALL_ITEMS.forEach(item => {
     const el = document.getElementById('f_' + item.id);
     if (el) el.value = r[item.id] || '';
+    if (item.bonus) {
+      const bel = document.getElementById('f_' + item.id + '_b');
+      if (bel) bel.value = r[item.id+'_b'] || '';
+    }
   });
   const normaEl = document.getElementById('f_norma');
   if (normaEl) normaEl.value = r.norma || '';
@@ -616,17 +691,27 @@ function buildDailyText(d) {
   t += `MNP(10pt)：${n(d.mnp)}件/合計${n(d.mnp)*10}pt\n`;
   t += `内訳）\nSB→${n(d.mnp_sb)}件\na→${n(d.mnp_a)}件\nUQ→${n(d.mnp_uq)}件\nYM →${n(d.mnp_ym)}件\n楽→${n(d.mnp_raku)}件\nその他→${n(d.mnp_other)}件\n`;
   t += `目標${n(d.mnp_target)}件\n`;
-  t += `新規(5Pt)：${n(d.shinki)}件/合計${n(d.shinki)*5}pt\n`;
-  t += `機変(7pt)：${n(d.kihen)}件/合計${n(d.kihen)*7}pt\n`;
-  t += `光1GB(8pt)：${n(d.hikari1)}件/合計${n(d.hikari1)*8}pt\n`;
-  t += `光10GB(10pt)：${n(d.hikari10)}件/合計${n(d.hikari10)*10}pt\n`;
-  t += `H5G(6pt)：${n(d.h5g)}件/合計${n(d.h5g)*6}pt\n`;
-  t += `Gカード(3pt):${n(d.gcard)}件/合計${n(d.gcard)*3}pt\n`;
-  t += `GUカード(3pt):${n(d.gucard)}件/合計${n(d.gucard)*3}pt\n`;
-  t += `Pカード(3pt):${n(d.pcard)}件/合計${n(d.pcard)*3}pt\n`;
+  const line = (item, label) => {
+    const c = n(d[item.id]);
+    const b = bonusCnt(d, item);
+    return `${label}(${item.pt}pt)：${c}件${b ? `（うち同時成約${b}件）` : ''}/合計${fmtPt(itemPt(d,item))}pt\n`;
+  };
+  const it = id => PT_ITEMS.find(x => x.id === id);
+  t += line(it('shinki'), '純粋新規');
+  t += line(it('shinki_sim'), '純粋新規(SIMのみ)');
+  t += line(it('kihen'), '取替(機変)');
+  t += line(it('hikari1'), '光1GB');
+  t += line(it('hikari10'), '光10GB');
+  t += line(it('h5g'), 'H5G');
+  t += line(it('gcard'), 'Gカード');
+  t += line(it('gucard'), 'GUカード');
+  t += line(it('pcard'), 'Pカード');
   t += `Rカード(0pt)：${n(d.rcard)}件\n`;
-  t += `でんき(2pt)：${n(d.denki)}件/合計${n(d.denki)*2}pt\n`;
-  t += `登録(1pt):${n(d.touroku)}件/合計${n(d.touroku)*1}pt\n`;
+  t += line(it('denki'), 'でんき');
+  t += line(it('touroku'), '登録');
+  t += line(it('dvalue'), 'dバリューパス');
+  const bonusPt = calcBonusPt(d);
+  if (bonusPt) t += `※光+dカード同時成約ボーナス加算：+${fmtPt(bonusPt)}pt\n`;
   const dayPt = calcDayPt(d);
   const norma = n(d.norma);
   const prog = norma > 0 ? ((dayPt / norma) * 100).toFixed(1) : '0';
@@ -648,7 +733,7 @@ function buildMonthlyText() {
   if (!mReports.length) return '該当する月間データがありません';
 
   const sum = k => mReports.reduce((s,r) => s + (r[k]||0), 0);
-  const cumPt = mReports.reduce((s,r) => s + calcDayPt(r), 0);
+  const cumPt = fmtPt(mReports.reduce((s,r) => s + calcDayPt(r), 0));
   const lastNorma = [...mReports].sort((a,b)=>b.date.localeCompare(a.date))[0]?.norma || 0;
   const prog = lastNorma > 0 ? ((cumPt / lastNorma)*100).toFixed(1) : '0';
 
@@ -656,17 +741,28 @@ function buildMonthlyText() {
   t += `MNP(10pt)：${sum('mnp')}件/合計${sum('mnp')*10}pt\n`;
   t += `内訳）\nSB→${sum('mnp_sb')}件\na→${sum('mnp_a')}件\nUQ→${sum('mnp_uq')}件\nYM →${sum('mnp_ym')}件\n楽→${sum('mnp_raku')}件\nその他→${sum('mnp_other')}件\n`;
   t += `目標${lastNorma > 0 ? (mReports[mReports.length-1]?.mnp_target||0) : 0}件\n`;
-  t += `新規(5Pt)：${sum('shinki')}件/合計${sum('shinki')*5}pt\n`;
-  t += `機変(7pt)：${sum('kihen')}件/合計${sum('kihen')*7}pt\n`;
-  t += `光1GB(8pt)：${sum('hikari1')}件/合計${sum('hikari1')*8}pt\n`;
-  t += `光10GB(10pt)：${sum('hikari10')}件/合計${sum('hikari10')*10}pt\n`;
-  t += `H5G(6pt)：${sum('h5g')}件/合計${sum('h5g')*6}pt\n`;
-  t += `Gカード(3pt):${sum('gcard')}件/合計${sum('gcard')*3}pt\n`;
-  t += `GUカード(3pt):${sum('gucard')}件/合計${sum('gucard')*3}pt\n`;
-  t += `Pカード(3pt):${sum('pcard')}件/合計${sum('pcard')*3}pt\n`;
+  const sumItemPt = item => mReports.reduce((s,r) => s + itemPt(r,item), 0);
+  const sumBonusCnt = item => mReports.reduce((s,r) => s + bonusCnt(r,item), 0);
+  const line = (item, label) => {
+    const b = sumBonusCnt(item);
+    return `${label}(${item.pt}pt)：${sum(item.id)}件${b ? `（うち同時成約${b}件）` : ''}/合計${fmtPt(sumItemPt(item))}pt\n`;
+  };
+  const it = id => PT_ITEMS.find(x => x.id === id);
+  t += line(it('shinki'), '純粋新規');
+  t += line(it('shinki_sim'), '純粋新規(SIMのみ)');
+  t += line(it('kihen'), '取替(機変)');
+  t += line(it('hikari1'), '光1GB');
+  t += line(it('hikari10'), '光10GB');
+  t += line(it('h5g'), 'H5G');
+  t += line(it('gcard'), 'Gカード');
+  t += line(it('gucard'), 'GUカード');
+  t += line(it('pcard'), 'Pカード');
   t += `Rカード(0pt)：${sum('rcard')}件\n`;
-  t += `でんき(2pt)：${sum('denki')}件/合計${sum('denki')*2}pt\n`;
-  t += `登録(1pt):${sum('touroku')}件/合計${sum('touroku')*1}pt\n`;
+  t += line(it('denki'), 'でんき');
+  t += line(it('touroku'), '登録');
+  t += line(it('dvalue'), 'dバリューパス');
+  const mBonusPt = mReports.reduce((s,r) => s + calcBonusPt(r), 0);
+  if (mBonusPt) t += `※光+dカード同時成約ボーナス加算：+${fmtPt(mBonusPt)}pt\n`;
   t += `ノルマ${lastNorma}pt/合計${cumPt}pt\n`;
   t += `進捗率:${prog}%`;
   return t;
@@ -712,15 +808,18 @@ function updateMonthly() {
   }).sort((a,b) => a.date.localeCompare(b.date));
 
   const sum = k => mReports.reduce((s,r) => s + (r[k]||0), 0);
-  const cumPt = mReports.reduce((s,r) => s + calcDayPt(r), 0);
+  const cumPt = fmtPt(mReports.reduce((s,r) => s + calcDayPt(r), 0));
   const lastNorma = mReports.length ? ([...mReports].sort((a,b)=>b.date.localeCompare(a.date))[0]?.norma || 0) : 0;
   const prog = lastNorma > 0 ? Math.min((cumPt/lastNorma)*100, 999) : 0;
+  const mBonusPt = mReports.reduce((s,r) => s + calcBonusPt(r), 0);
+  const mBonusCnt = mReports.reduce((s,r) => s + BONUS_ITEMS.reduce((t,i) => t + bonusCnt(r,i), 0), 0);
 
   document.getElementById('monthSummary').innerHTML = `
     <div class="summary-card"><div class="label">MNP</div><div class="value">${sum('mnp')}</div><div class="sub">${sum('mnp')*10}pt</div></div>
-    <div class="summary-card"><div class="label">新規</div><div class="value">${sum('shinki')}</div><div class="sub">${sum('shinki')*5}pt</div></div>
-    <div class="summary-card"><div class="label">機変</div><div class="value">${sum('kihen')}</div><div class="sub">${sum('kihen')*7}pt</div></div>
+    <div class="summary-card"><div class="label">純粋新規</div><div class="value">${sum('shinki')+sum('shinki_sim')}</div><div class="sub">${fmtPt(sum('shinki')*6+sum('shinki_sim')*3)}pt</div></div>
+    <div class="summary-card"><div class="label">取替(機変)</div><div class="value">${sum('kihen')}</div><div class="sub">${sum('kihen')*7}pt</div></div>
     <div class="summary-card"><div class="label">光合計</div><div class="value">${sum('hikari1')+sum('hikari10')}</div><div class="sub">${sum('hikari1')*8+sum('hikari10')*10}pt</div></div>
+    <div class="summary-card"><div class="label">🎁 同時成約</div><div class="value" style="color:#b45309;">${mBonusCnt}</div><div class="sub">+${fmtPt(mBonusPt)}pt</div></div>
     <div class="summary-card"><div class="label">累積pt</div><div class="value" style="color:var(--blue);">${cumPt}</div><div class="sub">/ ${lastNorma}pt</div></div>
     <div class="summary-card"><div class="label">進捗率</div><div class="value" style="color:${prog>=100?'var(--success)':'var(--primary)'};">${prog.toFixed(1)}%</div><div class="sub">${prog>=100?'達成！':'未達'}</div></div>
   `;
@@ -740,10 +839,11 @@ function updateMonthly() {
     return `<tr>
       <td>${r.date}</td><td>${esc(r.name)}</td>
       <td class="text-c">${r.mnp||0}</td>
-      <td class="text-c">${r.shinki||0}</td><td class="text-c">${r.kihen||0}</td>
+      <td class="text-c">${r.shinki||0}</td><td class="text-c">${r.shinki_sim||0}</td><td class="text-c">${r.kihen||0}</td>
       <td class="text-c">${r.hikari1||0}</td><td class="text-c">${r.hikari10||0}</td><td class="text-c">${r.h5g||0}</td>
       <td class="text-c">${r.gcard||0}</td><td class="text-c">${r.gucard||0}</td><td class="text-c">${r.pcard||0}</td><td class="text-c">${r.rcard||0}</td>
-      <td class="text-c">${r.denki||0}</td><td class="text-c">${r.touroku||0}</td>
+      <td class="text-c">${r.denki||0}</td><td class="text-c">${r.touroku||0}</td><td class="text-c">${r.dvalue||0}</td>
+      <td class="text-c" style="color:#b45309;">${BONUS_ITEMS.reduce((t,i)=>t+bonusCnt(r,i),0)}</td>
       <td class="text-c fw-b" style="color:var(--blue);">${dp}</td>
       <td class="text-c">${r.norma||0}</td>
     </tr>`;
@@ -752,10 +852,11 @@ function updateMonthly() {
   document.getElementById('monthFoot').innerHTML = mReports.length ? `<tr style="font-weight:700;background:var(--gray-50);">
     <td colspan="2">累計</td>
     <td class="text-c">${sum('mnp')}</td>
-    <td class="text-c">${sum('shinki')}</td><td class="text-c">${sum('kihen')}</td>
+    <td class="text-c">${sum('shinki')}</td><td class="text-c">${sum('shinki_sim')}</td><td class="text-c">${sum('kihen')}</td>
     <td class="text-c">${sum('hikari1')}</td><td class="text-c">${sum('hikari10')}</td><td class="text-c">${sum('h5g')}</td>
     <td class="text-c">${sum('gcard')}</td><td class="text-c">${sum('gucard')}</td><td class="text-c">${sum('pcard')}</td><td class="text-c">${sum('rcard')}</td>
-    <td class="text-c">${sum('denki')}</td><td class="text-c">${sum('touroku')}</td>
+    <td class="text-c">${sum('denki')}</td><td class="text-c">${sum('touroku')}</td><td class="text-c">${sum('dvalue')}</td>
+    <td class="text-c" style="color:#b45309;">${mBonusCnt}</td>
     <td class="text-c fw-b" style="color:var(--blue);">${cumPt}</td>
     <td class="text-c">${lastNorma}</td>
   </tr>` : '';
@@ -819,10 +920,11 @@ function renderList() {
     const dp = calcDayPt(r);
     return `<tr>
       <td>${r.date}</td><td>${esc(r.name)}</td>
-      <td class="text-c">${r.mnp||0}</td><td class="text-c">${r.shinki||0}</td><td class="text-c">${r.kihen||0}</td>
+      <td class="text-c">${r.mnp||0}</td><td class="text-c">${r.shinki||0}</td><td class="text-c">${r.shinki_sim||0}</td><td class="text-c">${r.kihen||0}</td>
       <td class="text-c">${r.hikari1||0}</td><td class="text-c">${r.hikari10||0}</td><td class="text-c">${r.h5g||0}</td>
       <td class="text-c">${r.gcard||0}</td><td class="text-c">${r.gucard||0}</td><td class="text-c">${r.pcard||0}</td><td class="text-c">${r.rcard||0}</td>
-      <td class="text-c">${r.denki||0}</td><td class="text-c">${r.touroku||0}</td>
+      <td class="text-c">${r.denki||0}</td><td class="text-c">${r.touroku||0}</td><td class="text-c">${r.dvalue||0}</td>
+      <td class="text-c" style="color:#b45309;">${BONUS_ITEMS.reduce((t,i)=>t+bonusCnt(r,i),0)}</td>
       <td class="text-c fw-b" style="color:var(--blue);">${dp}</td>
       <td class="text-c">${r.norma||0}</td>
       <td style="display:flex;gap:4px;"><button class="btn btn-outline" style="font-size:12px;padding:6px 10px;" onclick="editReport(${r.id})">編集</button><button class="btn btn-danger" onclick="deleteReport(${r.id})">削除</button></td>
@@ -835,13 +937,16 @@ function exportCSV() {
   if (!filteredData.length) { alert('出力するデータがありません'); return; }
   const bom = '\uFEFF';
   const cols = ['日付','報告者','MNP','SB','a','UQ','YM','楽','その他','MNP目標',
-    '新規','機変','光1GB','光10GB','H5G','Gカード','GUカード','Pカード','Rカード','でんき','登録',
+    '純粋新規','純粋新規SIMのみ','取替(機変)','光1GB','光10GB','H5G','Gカード','GUカード','Pカード','Rカード','でんき','登録','dバリューパス',
+    '光1GB同時','光10GB同時','H5G同時','Gカード同時','GUカード同時','Pカード同時','同時成約ボーナスpt',
     '日計pt','ノルマpt','備考','現状の課題点','課題点に対する改善・解決活動'];
   const header = cols.join(',')+'\n';
   const rows = filteredData.map(r => {
     const v = k => r[k]||0;
+    const b = id => bonusCnt(r, PT_ITEMS.find(x=>x.id===id));
     return [r.date,csvSafe(r.name),v('mnp'),v('mnp_sb'),v('mnp_a'),v('mnp_uq'),v('mnp_ym'),v('mnp_raku'),v('mnp_other'),v('mnp_target'),
-      v('shinki'),v('kihen'),v('hikari1'),v('hikari10'),v('h5g'),v('gcard'),v('gucard'),v('pcard'),v('rcard'),v('denki'),v('touroku'),
+      v('shinki'),v('shinki_sim'),v('kihen'),v('hikari1'),v('hikari10'),v('h5g'),v('gcard'),v('gucard'),v('pcard'),v('rcard'),v('denki'),v('touroku'),v('dvalue'),
+      b('hikari1'),b('hikari10'),b('h5g'),b('gcard'),b('gucard'),b('pcard'),fmtPt(calcBonusPt(r)),
       calcDayPt(r),v('norma'),csvSafe(r.memo),csvSafe(r.kadai),csvSafe(r.kaizen)].join(',');
   }).join('\n');
   const blob = new Blob([bom+header+rows],{type:'text/csv;charset=utf-8;'});
@@ -860,13 +965,16 @@ function updateSummary() {
     document.getElementById('itemBody').innerHTML=''; return;
   }
   const sum = k => reports.reduce((s,r) => s+(r[k]||0), 0);
-  const totalPt = reports.reduce((s,r) => s+calcDayPt(r), 0);
+  const totalPt = fmtPt(reports.reduce((s,r) => s+calcDayPt(r), 0));
+  const tBonusPt = reports.reduce((s,r) => s+calcBonusPt(r), 0);
+  const tBonusCnt = reports.reduce((s,r) => s + BONUS_ITEMS.reduce((t,i)=>t+bonusCnt(r,i),0), 0);
 
   document.getElementById('summaryCards').innerHTML = `
     <div class="summary-card"><div class="label">報告件数</div><div class="value">${reports.length}</div><div class="sub">日分</div></div>
     <div class="summary-card"><div class="label">MNP合計</div><div class="value">${sum('mnp')}</div><div class="sub">${sum('mnp')*10}pt</div></div>
-    <div class="summary-card"><div class="label">新規合計</div><div class="value">${sum('shinki')}</div><div class="sub">${sum('shinki')*5}pt</div></div>
-    <div class="summary-card"><div class="label">機変合計</div><div class="value">${sum('kihen')}</div><div class="sub">${sum('kihen')*7}pt</div></div>
+    <div class="summary-card"><div class="label">純粋新規合計</div><div class="value">${sum('shinki')+sum('shinki_sim')}</div><div class="sub">${fmtPt(sum('shinki')*6+sum('shinki_sim')*3)}pt</div></div>
+    <div class="summary-card"><div class="label">取替合計</div><div class="value">${sum('kihen')}</div><div class="sub">${sum('kihen')*7}pt</div></div>
+    <div class="summary-card"><div class="label">🎁 同時成約</div><div class="value" style="color:#b45309;">${tBonusCnt}</div><div class="sub">+${fmtPt(tBonusPt)}pt</div></div>
     <div class="summary-card"><div class="label">総獲得pt</div><div class="value" style="color:var(--blue);">${totalPt}</div><div class="sub">pt</div></div>
   `;
 
@@ -877,7 +985,7 @@ function updateSummary() {
   document.getElementById('dailyChart').innerHTML = dates.map(d => {
     const h = Math.max((byDate[d]/maxVal)*160,4);
     return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:36px;">
-      <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:4px;">${byDate[d]}pt</div>
+      <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:4px;">${fmtPt(byDate[d])}pt</div>
       <div style="width:100%;max-width:40px;height:${h}px;background:linear-gradient(180deg,#e60012,#ff4d00);border-radius:4px 4px 0 0;"></div>
       <div style="font-size:10px;color:var(--gray-500);margin-top:4px;">${d.slice(5)}</div>
     </div>`;
@@ -896,14 +1004,16 @@ function updateSummary() {
       return `<li style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--gray-100);">
         <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;${s}">${i+1}</div>
         <div style="flex:1;font-weight:600;">${esc(r[0])}</div>
-        <div style="font-weight:700;color:var(--blue);">${r[1]}pt</div>
+        <div style="font-weight:700;color:var(--blue);">${fmtPt(r[1])}pt</div>
       </li>`;
     }).join('');
   }
 
   document.getElementById('itemBody').innerHTML = [...PT_ITEMS,...NO_PT_ITEMS].map(item => {
     const t = sum(item.id);
-    return `<tr><td>${item.label}</td><td class="text-c fw-b">${t}</td><td class="text-c">${item.pt}pt</td><td class="text-c fw-b" style="color:var(--blue);">${t*item.pt}pt</td></tr>`;
+    const bc = reports.reduce((s,r) => s + bonusCnt(r,item), 0);
+    const tp = fmtPt(reports.reduce((s,r) => s + (item.pt ? itemPt(r,item) : 0), 0));
+    return `<tr><td>${item.label}${bc ? ` <span style="font-size:11px;color:#b45309;">🎁${bc}</span>` : ''}</td><td class="text-c fw-b">${t}</td><td class="text-c">${item.pt}pt</td><td class="text-c fw-b" style="color:var(--blue);">${tp}pt</td></tr>`;
   }).join('');
 }
 
