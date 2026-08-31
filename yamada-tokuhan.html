@@ -70,6 +70,16 @@
   .field-row.b4 { grid-template-columns:minmax(0,1fr) 68px 68px 84px; }
   .bonus-input { border-color:#f59e0b !important; background:#fffbeb !important; }
   .bonus-note { font-size:11px; color:#b45309; background:#fffbeb; border:1px solid #fcd34d; border-radius:6px; padding:6px 8px; margin:6px 0 8px; line-height:1.5; }
+  .rank-wrap { margin-top:16px; border:1.5px solid var(--gray-200); border-radius:10px; padding:14px; }
+  .rank-top { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .rank-badge { font-size:17px; font-weight:800; padding:6px 16px; border-radius:20px; }
+  .rank-cond { font-size:12px; color:var(--gray-500); }
+  .rank-next { font-size:13px; font-weight:600; margin-top:10px; padding:8px 10px; border-radius:6px; background:var(--gray-50); }
+  .rank-next .need { color:var(--primary); font-weight:800; }
+  .rank-steps { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:12px; }
+  .rank-step { text-align:center; font-size:11px; font-weight:700; padding:7px 2px; border-radius:6px; background:var(--gray-100); color:var(--gray-400); border:1.5px solid transparent; }
+  .rank-step .cond { display:block; font-size:10px; font-weight:600; opacity:0.85; margin-top:2px; }
+  .rank-step.on { border-color:currentColor; }
 
   .field-label { font-size:13px; font-weight:600; color:var(--gray-600); white-space:nowrap; }
   .field-label.sub-label { color:var(--gray-400); font-size:12px; }
@@ -154,7 +164,7 @@
 
 <div class="header">
   <h1>📊 ヤマダ電機特販 実績報告</h1>
-  <p>日別入力 ＋ 月間累積 — ポイント自動計算・進捗率つき<br><span style="font-size:11px;opacity:0.8;">26年度8月期 特販評価制度（全国閾値適用）対応版</span></p>
+  <p>日別入力 ＋ 月間累積 — ポイント自動計算・進捗率つき<br><span style="font-size:11px;opacity:0.8;">26年度9月期 特販評価制度（全国閾値適用）対応版</span></p>
 </div>
 
 <div class="nav">
@@ -208,9 +218,9 @@
 
     <!-- PT獲得項目 -->
     <div class="section">
-      <div class="section-header" onclick="toggleSection(this)">⭐ ポイント獲得項目 <span class="arrow">▼</span></div>
+      <div class="section-header" onclick="toggleSection(this)">⭐ 副商材別ポイント <span class="arrow">▼</span></div>
       <div class="section-body">
-        <div class="bonus-note">🎁 <strong>光＋dカード同時成約ボーナス</strong>（26年度8月期〜）<br>光1G/光10G/H5G・G/GU/Pカードのうち<strong>同時成約した件数</strong>を「うち同時」欄に入力すると、その件数分だけ <strong>pt×1.5</strong> で計算されます。<br>例）光1G 2件のうち1件が同時成約 → 8pt + 12pt = 20pt</div>
+        <div class="bonus-note">🎁 <strong>光＋dカード同時成約ボーナス</strong>（26年度9月期・全国閾値適用）<br>光1G/光10G/H5G・G/GU/Pカードのうち<strong>同時成約した件数</strong>を「うち同時」欄に入力すると、その件数分だけ <strong>pt×1.5</strong> で計算されます。<br>例）光10G（10pt）とdカードGOLD（3pt）を同時成約 → 光10G 15pt・GOLD 4.5pt</div>
         <div class="field-row b4">
           <div class="field-label"></div>
           <div class="col-header">件数</div>
@@ -391,6 +401,9 @@
       </div>
     </div>
 
+    <!-- 特販ランク判定 -->
+    <div class="rank-wrap" id="rankWrap"></div>
+
     <div class="table-wrap" style="margin-top:16px;">
       <table>
         <thead><tr>
@@ -475,7 +488,7 @@
 
 <script>
 // ========== Point config ==========
-// 26年度8月期特販評価制度（全国閾値適用）準拠
+// 26年度9月期特販評価制度（全国閾値適用）準拠 ※配点は8月期から継続
 const PT_ITEMS = [
   {id:'mnp', label:'MNP(PI)', pt:10},
   {id:'shinki', label:'純粋新規', pt:6},
@@ -498,6 +511,16 @@ const BONUS_ITEMS = PT_ITEMS.filter(i => i.bonus);
 const BONUS_RATE = 1.5;
 // 0.5pt刻み対応の表示ヘルパー
 function fmtPt(n) { return Math.round(n*100)/100; }
+
+// ========== 特販ランク判定（26年度9月期・全国閾値適用） ==========
+// PI（MNP）件数 × 副商材ポイント のマトリクスで判定
+const RANKS = [
+  {key:'platinum', label:'プラチナ特販', pi:60, pt:890, color:'#c2410c', bg:'#ffedd5'},
+  {key:'gold',     label:'ゴールド特販', pi:50, pt:690, color:'#a16207', bg:'#fef9c3'},
+  {key:'silver',   label:'シルバー特販', pi:10, pt:200, color:'#475569', bg:'#e2e8f0'},
+  {key:'bronze',   label:'ブロンズ特販', pi:0,  pt:0,   color:'#78350f', bg:'#f5f0ea'},
+];
+function judgeRank(pi, pt) { return RANKS.find(r => pi >= r.pi && pt >= r.pt) || RANKS[RANKS.length-1]; }
 
 // ========== Google Sheets ==========
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbx6eVYlDBOQUxafPBiZrWWFe99-dJ9LWTRD5vDDI4WItr83jCwLP1bNzCknxicYUBk/exec';
@@ -833,6 +856,8 @@ function updateMonthly() {
   fill.style.background = prog >= 100 ? 'var(--success)' : 'linear-gradient(90deg, var(--primary), #ff4d00)';
   fill.textContent = prog.toFixed(1) + '%';
 
+  renderRank(sum('mnp'), cumPt);
+
   const v = k => (r) => r[k]||0;
   document.getElementById('monthBody').innerHTML = mReports.map(r => {
     const dp = calcDayPt(r);
@@ -860,6 +885,45 @@ function updateMonthly() {
     <td class="text-c fw-b" style="color:var(--blue);">${cumPt}</td>
     <td class="text-c">${lastNorma}</td>
   </tr>` : '';
+}
+
+// ========== 特販ランク表示 ==========
+function renderRank(pi, pt) {
+  const wrap = document.getElementById('rankWrap');
+  if (!wrap) return;
+  const cur = judgeRank(pi, pt);
+  const idx = RANKS.indexOf(cur);
+  const next = idx > 0 ? RANKS[idx-1] : null;
+
+  let nextHtml;
+  if (!next) {
+    nextHtml = `<div class="rank-next" style="background:#ffedd5;color:#c2410c;">🏆 最上位ランク達成中！3ヶ月継続で勲章進呈</div>`;
+  } else {
+    const needPi = Math.max(next.pi - pi, 0);
+    const needPt = Math.max(fmtPt(next.pt - pt), 0);
+    const parts = [];
+    if (needPi > 0) parts.push(`PI <span class="need">あと${needPi}件</span>`);
+    if (needPt > 0) parts.push(`<span class="need">あと${needPt}pt</span>`);
+    nextHtml = parts.length
+      ? `<div class="rank-next">⬆️ ${next.label}まで　${parts.join('　/　')}</div>`
+      : `<div class="rank-next">⬆️ ${next.label}の条件を満たしています</div>`;
+  }
+
+  const steps = [...RANKS].reverse().map(r => {
+    const on = RANKS.indexOf(r) >= idx;
+    const st = on ? `background:${r.bg};color:${r.color};` : '';
+    const cond = r.pi > 0 ? `PI${r.pi}件 / ${r.pt}pt` : '&nbsp;';
+    return `<div class="rank-step ${on?'on':''}" style="${st}">${r.label.replace('特販','')}<span class="cond">${cond}</span></div>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div class="rank-top">
+      <span class="rank-badge" style="background:${cur.bg};color:${cur.color};">${cur.label}</span>
+      <span class="rank-cond">PI <strong style="color:var(--gray-700);">${pi}</strong>件 ／ 副商材 <strong style="color:var(--blue);">${fmtPt(pt)}</strong>pt</span>
+    </div>
+    ${nextHtml}
+    <div class="rank-steps">${steps}</div>
+  `;
 }
 
 // ========== Recent ==========
