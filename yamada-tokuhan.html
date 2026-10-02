@@ -540,7 +540,10 @@ const PERIODS = [
     ],
   },
 ];
-function todayStr() { return new Date().toISOString().slice(0,10); }
+// 端末のローカル日付（日本時間）で YYYY-MM-DD を返す
+// ※toISOString() はUTC変換されるため、日本時間の0〜9時や月初で前日・前月にずれる
+function ymd(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function todayStr() { return ymd(new Date()); }
 function periodOf(date) {
   const d = date || todayStr();
   return PERIODS.find(p => d >= p.from) || PERIODS[PERIODS.length-1];
@@ -636,7 +639,7 @@ function getVal(id) { return Number(document.getElementById('f_'+id)?.value) || 
 
 // ========== Init ==========
 window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('reportDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('reportDate').value = todayStr();
   buildMonthSelect();
   updateAll();
   calcPt();  // 今日の期の配点でバッジを初期表示
@@ -699,7 +702,7 @@ function submitReport(e) {
   }
   save();
   resetForm();
-  document.getElementById('reportDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('reportDate').value = todayStr();
   updateAll();
   applyFilter();
 }
@@ -707,7 +710,7 @@ function submitReport(e) {
 function resetForm() {
   editingId = null;
   document.getElementById('reportForm').reset();
-  document.getElementById('reportDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('reportDate').value = todayStr();
   document.getElementById('previewArea').classList.add('hidden');
   document.getElementById('submitBtn').textContent = '✅ 報告を登録';
   calcPt();
@@ -864,7 +867,7 @@ function buildMonthSelect() {
   const now = new Date();
   for (let i = 0; i < 12; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const val = d.toISOString().slice(0,7);
+    const val = ymd(d).slice(0,7);
     const label = `${d.getFullYear()}年${d.getMonth()+1}月`;
     sel.innerHTML += `<option value="${val}">${label}</option>`;
   }
@@ -1067,7 +1070,7 @@ function exportCSV() {
   }).join('\n');
   const blob = new Blob([bom+header+rows],{type:'text/csv;charset=utf-8;'});
   const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download=`ヤマダ特販_実績_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  a.download=`ヤマダ特販_実績_${todayStr()}.csv`; a.click();
   showToast('📥 CSVを出力しました！');
 }
 function csvSafe(s) { if(!s)return''; return s.includes(',')||s.includes('"')||s.includes('\n') ? '"'+s.replace(/"/g,'""')+'"' : s; }
@@ -1140,7 +1143,7 @@ function exportJSON() {
   const blob = new Blob([JSON.stringify(reports, null, 2)], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `ヤマダ特販_データ_${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `ヤマダ特販_データ_${todayStr()}.json`;
   a.click();
   showToast('💾 データを保存しました！');
 }
