@@ -164,7 +164,7 @@
 
 <div class="header">
   <h1>📊 ヤマダ電機特販 実績報告</h1>
-  <p>日別入力 ＋ 月間累積 — ポイント自動計算・進捗率つき<br><span style="font-size:11px;opacity:0.8;">26年度9月期 特販評価制度（全国閾値適用）対応版</span></p>
+  <p>日別入力 ＋ 月間累積 — ポイント自動計算・進捗率つき<br><span style="font-size:11px;opacity:0.8;">26年度10月期 特販評価制度 対応版</span></p>
 </div>
 
 <div class="nav">
@@ -189,7 +189,7 @@
       </div>
       <div class="form-group">
         <label>報告日 <span class="req">*</span></label>
-        <input type="date" id="reportDate" required>
+        <input type="date" id="reportDate" required onchange="calcPt()">
       </div>
     </div>
 
@@ -220,7 +220,7 @@
     <div class="section">
       <div class="section-header" onclick="toggleSection(this)">⭐ 副商材別ポイント <span class="arrow">▼</span></div>
       <div class="section-body">
-        <div class="bonus-note">🎁 <strong>光＋dカード同時成約ボーナス</strong>（26年度9月期・全国閾値適用）<br>光1G/光10G/H5G・G/GU/Pカードのうち<strong>同時成約した件数</strong>を「うち同時」欄に入力すると、その件数分だけ <strong>pt×1.5</strong> で計算されます。<br>例）光10G（10pt）とdカードGOLD（3pt）を同時成約 → 光10G 15pt・GOLD 4.5pt</div>
+        <div class="bonus-note">🎁 <strong>光＋dカード同時成約ボーナス</strong>（26年度10月期）<br>光1G/光10G/H5G・G/GU/Pカードのうち<strong>同時成約した件数</strong>を「うち同時」欄に入力すると、その件数分だけ <strong>pt×1.5</strong> で計算されます。<br>例）光10G（10pt）とdカードGOLD（3pt）を同時成約 → 光10G 15pt・GOLD 4.5pt</div>
         <div class="field-row b4">
           <div class="field-label"></div>
           <div class="col-header">件数</div>
@@ -488,7 +488,7 @@
 
 <script>
 // ========== Point config ==========
-// 26年度9月期特販評価制度（全国閾値適用）準拠 ※配点は8月期から継続
+// 基本配点（26年度8〜9月期）。期ごとの差分は下の PERIODS で上書きする
 const PT_ITEMS = [
   {id:'mnp', label:'MNP(PI)', pt:10},
   {id:'shinki', label:'純粋新規', pt:6},
@@ -512,15 +512,48 @@ const BONUS_RATE = 1.5;
 // 0.5pt刻み対応の表示ヘルパー
 function fmtPt(n) { return Math.round(n*100)/100; }
 
-// ========== 特販ランク判定（26年度9月期・全国閾値適用） ==========
-// PI（MNP）件数 × 副商材ポイント のマトリクスで判定
-const RANKS = [
-  {key:'platinum', label:'プラチナ特販', pi:60, pt:890, color:'#c2410c', bg:'#ffedd5'},
-  {key:'gold',     label:'ゴールド特販', pi:50, pt:690, color:'#a16207', bg:'#fef9c3'},
-  {key:'silver',   label:'シルバー特販', pi:10, pt:200, color:'#475569', bg:'#e2e8f0'},
-  {key:'bronze',   label:'ブロンズ特販', pi:0,  pt:0,   color:'#78350f', bg:'#f5f0ea'},
+// ========== 期別ルール（配点の上書き＋ランク表） ==========
+// 報告日（月間累積は対象月の1日）で適用する期を決定。新しい期は配列の先頭に追加する。
+// ランク判定は PI（MNP）件数 × 獲得ポイント の両方を満たした最上位を採用
+const PERIODS = [
+  {
+    from:'2026-10-01', name:'26年度10月期', rankTitle:'特販グレード',
+    ptOverride:{ denki:0 },   // 10月期の商材別ポイント表から「ドコモでんき」が除外
+    topMsg:'🏆 最上位グレード達成中！',
+    ranks:[
+      {label:'グレード5', pi:60, pt:900, color:'#a21caf', bg:'#fae8ff'},
+      {label:'グレード4', pi:50, pt:700, color:'#a16207', bg:'#fef9c3'},
+      {label:'グレード3', pi:20, pt:400, color:'#475569', bg:'#e5e7eb'},
+      {label:'グレード2', pi:10, pt:200, color:'#15803d', bg:'#dcfce7'},
+      {label:'グレード1', pi:0,  pt:0,   color:'#c2410c', bg:'#ffedd5'},
+    ],
+  },
+  {
+    from:'0000-01-01', name:'26年度9月期', rankTitle:'特販ランク',
+    ptOverride:{},
+    topMsg:'🏆 最上位ランク達成中！3ヶ月継続で勲章進呈',
+    ranks:[
+      {label:'プラチナ特販', pi:60, pt:890, color:'#c2410c', bg:'#ffedd5'},
+      {label:'ゴールド特販', pi:50, pt:690, color:'#a16207', bg:'#fef9c3'},
+      {label:'シルバー特販', pi:10, pt:200, color:'#475569', bg:'#e2e8f0'},
+      {label:'ブロンズ特販', pi:0,  pt:0,   color:'#78350f', bg:'#f5f0ea'},
+    ],
+  },
 ];
-function judgeRank(pi, pt) { return RANKS.find(r => pi >= r.pi && pt >= r.pt) || RANKS[RANKS.length-1]; }
+function todayStr() { return new Date().toISOString().slice(0,10); }
+function periodOf(date) {
+  const d = date || todayStr();
+  return PERIODS.find(p => d >= p.from) || PERIODS[PERIODS.length-1];
+}
+// 指定日の配点
+function ptOf(item, date) {
+  const o = periodOf(date).ptOverride;
+  return (item.id in o) ? o[item.id] : item.pt;
+}
+function judgeRank(pi, pt, date) {
+  const ranks = periodOf(date).ranks;
+  return ranks.find(r => pi >= r.pi && pt >= r.pt) || ranks[ranks.length-1];
+}
 
 // ========== Google Sheets ==========
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbx6eVYlDBOQUxafPBiZrWWFe99-dJ9LWTRD5vDDI4WItr83jCwLP1bNzCknxicYUBk/exec';
@@ -558,22 +591,23 @@ function bonusCnt(r, item) {
   if (!item.bonus) return 0;
   return Math.min(Number(r[item.id+'_b'])||0, Number(r[item.id])||0);
 }
-// 1項目の獲得pt（通常分＋ボーナス分）
+// 1項目の獲得pt（通常分＋ボーナス分）※報告日の期の配点で計算
 function itemPt(r, item) {
+  const pt = ptOf(item, r.date);
   const c = Number(r[item.id])||0;
   const b = bonusCnt(r, item);
-  return (c - b) * item.pt + b * item.pt * BONUS_RATE;
+  return (c - b) * pt + b * pt * BONUS_RATE;
 }
 // ボーナスによる加算分のみ
 function calcBonusPt(r) {
-  return BONUS_ITEMS.reduce((s,item) => s + bonusCnt(r,item) * item.pt * (BONUS_RATE - 1), 0);
+  return BONUS_ITEMS.reduce((s,item) => s + bonusCnt(r,item) * ptOf(item, r.date) * (BONUS_RATE - 1), 0);
 }
 function calcDayPt(r) {
   return fmtPt(PT_ITEMS.reduce((s,item) => s + itemPt(r,item), 0));
 }
 
 function calcPt() {
-  const r = {};
+  const r = { date: document.getElementById('reportDate')?.value || todayStr() };
   ALL_ITEMS.forEach(item => {
     r[item.id] = Number(document.getElementById('f_'+item.id)?.value) || 0;
     if (item.bonus) r[item.id+'_b'] = Number(document.getElementById('f_'+item.id+'_b')?.value) || 0;
@@ -582,8 +616,16 @@ function calcPt() {
   PT_ITEMS.forEach(item => {
     const p = itemPt(r, item);
     total += p;
+    const unit = ptOf(item, r.date);
     const el = document.getElementById('pt_'+item.id);
-    if (el) el.textContent = fmtPt(p) + 'pt';
+    if (el) el.textContent = unit === 0 ? '対象外' : fmtPt(p) + 'pt';
+    // 報告日の期に合わせて配点バッジを更新（0ptはグレー表示）
+    const badge = document.getElementById('f_'+item.id)?.closest('.field-row')?.querySelector('.pt-badge');
+    if (badge) {
+      badge.textContent = fmtPt(unit) + 'pt';
+      badge.style.background = unit === 0 ? '#f3f4f6' : '';
+      badge.style.color = unit === 0 ? 'var(--gray-500)' : '';
+    }
   });
   const bEl = document.getElementById('pt_bonus');
   if (bEl) bEl.textContent = '+' + fmtPt(calcBonusPt(r)) + 'pt';
@@ -597,6 +639,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('reportDate').value = new Date().toISOString().slice(0,10);
   buildMonthSelect();
   updateAll();
+  calcPt();  // 今日の期の配点でバッジを初期表示
 });
 
 // ========== Tabs ==========
@@ -717,7 +760,9 @@ function buildDailyText(d) {
   const line = (item, label) => {
     const c = n(d[item.id]);
     const b = bonusCnt(d, item);
-    return `${label}(${item.pt}pt)：${c}件${b ? `（うち同時成約${b}件）` : ''}/合計${fmtPt(itemPt(d,item))}pt\n`;
+    const unit = ptOf(item, d.date);
+    if (unit === 0) return `${label}(対象外)：${c}件\n`;
+    return `${label}(${fmtPt(unit)}pt)：${c}件${b ? `（うち同時成約${b}件）` : ''}/合計${fmtPt(itemPt(d,item))}pt\n`;
   };
   const it = id => PT_ITEMS.find(x => x.id === id);
   t += line(it('shinki'), '純粋新規');
@@ -768,7 +813,9 @@ function buildMonthlyText() {
   const sumBonusCnt = item => mReports.reduce((s,r) => s + bonusCnt(r,item), 0);
   const line = (item, label) => {
     const b = sumBonusCnt(item);
-    return `${label}(${item.pt}pt)：${sum(item.id)}件${b ? `（うち同時成約${b}件）` : ''}/合計${fmtPt(sumItemPt(item))}pt\n`;
+    const unit = ptOf(item, month + '-01');
+    if (unit === 0) return `${label}(対象外)：${sum(item.id)}件\n`;
+    return `${label}(${fmtPt(unit)}pt)：${sum(item.id)}件${b ? `（うち同時成約${b}件）` : ''}/合計${fmtPt(sumItemPt(item))}pt\n`;
   };
   const it = id => PT_ITEMS.find(x => x.id === id);
   t += line(it('shinki'), '純粋新規');
@@ -787,7 +834,9 @@ function buildMonthlyText() {
   const mBonusPt = mReports.reduce((s,r) => s + calcBonusPt(r), 0);
   if (mBonusPt) t += `※光+dカード同時成約ボーナス加算：+${fmtPt(mBonusPt)}pt\n`;
   t += `ノルマ${lastNorma}pt/合計${cumPt}pt\n`;
-  t += `進捗率:${prog}%`;
+  t += `進捗率:${prog}%\n`;
+  const per = periodOf(month + '-01');
+  t += `${per.rankTitle}：${judgeRank(sum('mnp'), cumPt, month + '-01').label}（PI${sum('mnp')}件/${cumPt}pt）`;
   return t;
 }
 
@@ -856,7 +905,7 @@ function updateMonthly() {
   fill.style.background = prog >= 100 ? 'var(--success)' : 'linear-gradient(90deg, var(--primary), #ff4d00)';
   fill.textContent = prog.toFixed(1) + '%';
 
-  renderRank(sum('mnp'), cumPt);
+  renderRank(sum('mnp'), cumPt, month + '-01');
 
   const v = k => (r) => r[k]||0;
   document.getElementById('monthBody').innerHTML = mReports.map(r => {
@@ -888,16 +937,18 @@ function updateMonthly() {
 }
 
 // ========== 特販ランク表示 ==========
-function renderRank(pi, pt) {
+function renderRank(pi, pt, date) {
   const wrap = document.getElementById('rankWrap');
   if (!wrap) return;
-  const cur = judgeRank(pi, pt);
+  const per = periodOf(date);
+  const RANKS = per.ranks;
+  const cur = judgeRank(pi, pt, date);
   const idx = RANKS.indexOf(cur);
   const next = idx > 0 ? RANKS[idx-1] : null;
 
   let nextHtml;
   if (!next) {
-    nextHtml = `<div class="rank-next" style="background:#ffedd5;color:#c2410c;">🏆 最上位ランク達成中！3ヶ月継続で勲章進呈</div>`;
+    nextHtml = `<div class="rank-next" style="background:${cur.bg};color:${cur.color};">${per.topMsg}</div>`;
   } else {
     const needPi = Math.max(next.pi - pi, 0);
     const needPt = Math.max(fmtPt(next.pt - pt), 0);
@@ -912,17 +963,18 @@ function renderRank(pi, pt) {
   const steps = [...RANKS].reverse().map(r => {
     const on = RANKS.indexOf(r) >= idx;
     const st = on ? `background:${r.bg};color:${r.color};` : '';
-    const cond = r.pi > 0 ? `PI${r.pi}件 / ${r.pt}pt` : '&nbsp;';
+    const cond = r.pi > 0 ? `PI${r.pi}件<br>${r.pt}pt` : '&nbsp;<br>&nbsp;';
     return `<div class="rank-step ${on?'on':''}" style="${st}">${r.label.replace('特販','')}<span class="cond">${cond}</span></div>`;
   }).join('');
 
   wrap.innerHTML = `
+    <div style="font-size:12px;font-weight:700;color:var(--gray-500);margin-bottom:8px;">🏅 ${per.rankTitle}判定（${per.name}）</div>
     <div class="rank-top">
       <span class="rank-badge" style="background:${cur.bg};color:${cur.color};">${cur.label}</span>
-      <span class="rank-cond">PI <strong style="color:var(--gray-700);">${pi}</strong>件 ／ 副商材 <strong style="color:var(--blue);">${fmtPt(pt)}</strong>pt</span>
+      <span class="rank-cond">PI <strong style="color:var(--gray-700);">${pi}</strong>件 ／ 獲得 <strong style="color:var(--blue);">${fmtPt(pt)}</strong>pt</span>
     </div>
     ${nextHtml}
-    <div class="rank-steps">${steps}</div>
+    <div class="rank-steps" style="grid-template-columns:repeat(${RANKS.length},1fr);">${steps}</div>
   `;
 }
 
@@ -1077,7 +1129,8 @@ function updateSummary() {
     const t = sum(item.id);
     const bc = reports.reduce((s,r) => s + bonusCnt(r,item), 0);
     const tp = fmtPt(reports.reduce((s,r) => s + (item.pt ? itemPt(r,item) : 0), 0));
-    return `<tr><td>${item.label}${bc ? ` <span style="font-size:11px;color:#b45309;">🎁${bc}</span>` : ''}</td><td class="text-c fw-b">${t}</td><td class="text-c">${item.pt}pt</td><td class="text-c fw-b" style="color:var(--blue);">${tp}pt</td></tr>`;
+    const unitNow = ptOf(item);  // 現在の期の配点
+    return `<tr><td>${item.label}${bc ? ` <span style="font-size:11px;color:#b45309;">🎁${bc}</span>` : ''}</td><td class="text-c fw-b">${t}</td><td class="text-c">${unitNow === 0 ? '対象外' : fmtPt(unitNow) + 'pt'}</td><td class="text-c fw-b" style="color:var(--blue);">${tp}pt</td></tr>`;
   }).join('');
 }
 
