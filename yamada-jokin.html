@@ -350,6 +350,11 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// 端末のローカル日付（日本時間）で YYYY-MM-DD を返す
+// ※toISOString() はUTC変換されるため、日本時間の0〜9時や月初で前日・前月にずれる
+function ymd(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function todayStr() { return ymd(new Date()); }
+
 // ========== Fields ==========
 const FIELDS = [
   ['outai','応対件数'],['pi','PI獲得数'],['mb','MB総販'],['touroku','登録件数'],
@@ -397,7 +402,7 @@ function save() { try { localStorage.setItem('yamadaJokin', JSON.stringify(repor
 
 // ========== Init ==========
 window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('reportDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('reportDate').value = todayStr();
   buildMonthSelect();
   updateAll();
 });
@@ -444,14 +449,14 @@ function submitReport(e) {
     showToast('✅ 報告を登録しました！');
   }
   save(); resetForm();
-  document.getElementById('reportDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('reportDate').value = todayStr();
   updateAll(); applyFilter();
 }
 
 function resetForm() {
   editingId = null;
   document.getElementById('reportForm').reset();
-  document.getElementById('reportDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('reportDate').value = todayStr();
   document.getElementById('previewArea').classList.add('hidden');
   document.getElementById('submitBtn').textContent = '✅ 報告を登録';
 }
@@ -556,7 +561,7 @@ function buildMonthSelect() {
   const now = new Date();
   for (let i = 0; i < 12; i++) {
     const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
-    sel.innerHTML += `<option value="${d.toISOString().slice(0,7)}">${d.getFullYear()}年${d.getMonth()+1}月</option>`;
+    sel.innerHTML += `<option value="${ymd(d).slice(0,7)}">${d.getFullYear()}年${d.getMonth()+1}月</option>`;
   }
 }
 function updateMonthly() {
@@ -654,7 +659,7 @@ function exportCSV() {
   }).join('\n');
   const blob = new Blob([bom+header+rows],{type:'text/csv;charset=utf-8;'});
   const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download=`ヤマダ常勤_実績_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  a.download=`ヤマダ常勤_実績_${todayStr()}.csv`; a.click();
   showToast('📥 CSVを出力しました！');
 }
 function csvSafe(s) { if(!s)return''; return s.includes(',')||s.includes('"')||s.includes('\n')?'"'+s.replace(/"/g,'""')+'"':s; }
@@ -717,7 +722,7 @@ function exportJSON() {
   if (!reports.length) { alert('保存するデータがありません'); return; }
   const blob = new Blob([JSON.stringify(reports,null,2)],{type:'application/json'});
   const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download=`ヤマダ常勤_データ_${new Date().toISOString().slice(0,10)}.json`; a.click();
+  a.download=`ヤマダ常勤_データ_${todayStr()}.json`; a.click();
   showToast('💾 データを保存しました！');
 }
 function importJSON(e) {
